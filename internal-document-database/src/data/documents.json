@@ -1,0 +1,260 @@
+{
+  "documents": [
+    {
+      "id": "emp-handbook-2024",
+      "title": "Atko Employee Handbook 2024",
+      "content": "Welcome to Atko Corporation! This handbook provides essential information about our company policies, benefits, and procedures.\n\n## Company Overview\nAtko Corporation is a leading technology company focused on innovation and employee well-being. We believe in fostering a collaborative environment where every employee can thrive.\n\n## Core Values\n- Innovation: We encourage creative thinking and new ideas\n- Collaboration: Teamwork is essential to our success\n- Integrity: We operate with honesty and transparency\n- Excellence: We strive for the highest quality in everything we do\n\n## Working Hours\nStandard working hours are 9:00 AM to 5:00 PM, Monday through Friday. Flexible work arrangements are available for eligible employees.\n\n## Dress Code\nBusiness casual attire is appropriate for most work environments. Some departments may have specific requirements.\n\n## Communication\nWe use various communication tools including email, Slack, and Microsoft Teams. Please check your messages regularly and respond promptly.",
+      "category": "HR",
+      "author": "HR Department",
+      "createdDate": "2024-01-15T10:00:00.000Z",
+      "updatedDate": "2024-01-15T10:00:00.000Z",
+      "tags": [
+        "handbook",
+        "policies",
+        "onboarding",
+        "company-culture"
+      ],
+      "version": 1,
+      "isPublic": true,
+      "allowedEditors": [
+        "hr-admin"
+      ]
+    },
+    {
+      "id": "benefits-guide-2024",
+      "title": "Employee Benefits Guide 2024",
+      "content": "Atko Corporation offers comprehensive benefits to support our employees' health, financial security, and work-life balance.\n\n## Health Benefits\n- Medical, Dental, and Vision coverage\n- Health Savings Account (HSA) with company contribution\n- Flexible Spending Account (FSA)\n- Mental health support and counseling services\n\n## Financial Benefits\n- 401(k) retirement plan with company match\n- Stock options and equity grants\n- Life insurance and disability coverage\n- Financial planning assistance\n\n## Time Off\n- 20 days of Paid Time Off (PTO) annually\n- 10 company holidays\n- Sick leave and personal days\n- Parental leave for new parents\n\n## Professional Development\n- Tuition reimbursement\n- Conference and training budgets\n- Internal learning programs\n- Career development planning\n\n## Additional Perks\n- Free lunch on Fridays\n- Gym membership reimbursement\n- Commuter benefits\n- Employee discount programs",
+      "category": "HR",
+      "author": "Benefits Team",
+      "createdDate": "2024-01-20T14:30:00.000Z",
+      "updatedDate": "2024-01-20T14:30:00.000Z",
+      "tags": [
+        "benefits",
+        "health",
+        "financial",
+        "time-off",
+        "development"
+      ],
+      "version": 1,
+      "isPublic": true,
+      "allowedEditors": [
+        "hr-admin",
+        "benefits-admin"
+      ]
+    },
+    {
+      "id": "remote-work-policy",
+      "title": "Remote Work Policy",
+      "content": "Atko Corporation supports flexible work arrangements including remote work options.\n\n## Eligibility\nFull-time employees in good standing may be eligible for remote work arrangements. Eligibility is determined by job function, performance, and manager approval.\n\n## Remote Work Guidelines\n- Maintain regular working hours and availability\n- Use company-approved communication tools\n- Ensure secure internet connection\n- Keep work environment professional\n- Participate in all required meetings and activities\n\n## Equipment and Technology\n- Company-provided laptop and necessary equipment\n- VPN access for secure remote connection\n- Video conferencing tools and software\n- Technical support available during business hours\n\n## Performance Expectations\n- Meet all performance goals and deadlines\n- Maintain regular communication with team\n- Complete all assigned tasks and projects\n- Participate in team meetings and activities\n\n## Security Requirements\n- Use company VPN when accessing internal systems\n- Follow all security policies and procedures\n- Protect company information and data\n- Report any security concerns immediately",
+      "category": "HR",
+      "author": "HR Department",
+      "createdDate": "2024-02-01T09:00:00.000Z",
+      "updatedDate": "2024-02-01T09:00:00.000Z",
+      "tags": [
+        "remote-work",
+        "flexible-work",
+        "work-from-home",
+        "policy"
+      ],
+      "version": 1,
+      "isPublic": true,
+      "allowedEditors": [
+        "hr-admin"
+      ]
+    },
+    {
+      "id": "it-security-policy",
+      "title": "IT Security Policy",
+      "content": "This policy outlines the security requirements and best practices for all Atko employees.\n\n## Password Requirements\n- Minimum 12 characters\n- Include uppercase, lowercase, numbers, and special characters\n- Change passwords every 90 days\n- Use unique passwords for different accounts\n- Never share passwords with others\n\n## Device Security\n- Enable full-disk encryption on all devices\n- Install and keep security software updated\n- Lock devices when not in use\n- Report lost or stolen devices immediately\n- Use company-approved devices for work\n\n## Data Protection\n- Classify data according to sensitivity levels\n- Use encryption for sensitive data transmission\n- Follow data retention and disposal policies\n- Never store sensitive data on personal devices\n- Report data breaches immediately\n\n## Network Security\n- Use company VPN when working remotely\n- Avoid public Wi-Fi for work activities\n- Keep network credentials secure\n- Report suspicious network activity\n- Follow acceptable use policies\n\n## Incident Response\n- Report security incidents immediately\n- Follow incident response procedures\n- Cooperate with security investigations\n- Preserve evidence when possible\n- Contact IT Security team for assistance",
+      "category": "IT",
+      "author": "IT Security Team",
+      "createdDate": "2024-01-10T16:00:00.000Z",
+      "updatedDate": "2024-01-10T16:00:00.000Z",
+      "tags": [
+        "security",
+        "passwords",
+        "data-protection",
+        "network",
+        "incident-response"
+      ],
+      "version": 1,
+      "isPublic": true,
+      "allowedEditors": [
+        "it-admin",
+        "security-admin"
+      ]
+    },
+    {
+      "id": "software-installation-guide",
+      "title": "Software Installation Guide",
+      "content": "This guide provides instructions for installing and configuring software on Atko devices.\n\n## Standard Software\nAll Atko devices come pre-installed with standard software including:\n- Microsoft Office Suite\n- Web browsers (Chrome, Firefox, Safari)\n- Communication tools (Slack, Teams)\n- Security software (antivirus, VPN)\n\n## Software Installation Process\n1. Submit software request through IT portal\n2. Wait for approval from IT department\n3. Download from approved sources only\n4. Follow installation instructions carefully\n5. Test functionality after installation\n6. Report any issues to IT support\n\n## Approved Software Sources\n- Company software repository\n- Official vendor websites\n- App stores (with IT approval)\n- Never download from unknown sources\n\n## License Management\n- All software must be properly licensed\n- Report software license issues\n- Follow license renewal procedures\n- Do not install unlicensed software\n\n## Troubleshooting\n- Check IT knowledge base first\n- Contact IT helpdesk for assistance\n- Provide detailed error messages\n- Follow troubleshooting procedures\n- Document solutions for future reference",
+      "category": "IT",
+      "author": "IT Support Team",
+      "createdDate": "2024-01-25T11:30:00.000Z",
+      "updatedDate": "2024-01-25T11:30:00.000Z",
+      "tags": [
+        "software",
+        "installation",
+        "licensing",
+        "troubleshooting",
+        "it-support"
+      ],
+      "version": 1,
+      "isPublic": true,
+      "allowedEditors": [
+        "it-admin",
+        "support-admin"
+      ]
+    },
+    {
+      "id": "expense-reimbursement-policy",
+      "title": "Expense Reimbursement Policy",
+      "content": "This policy outlines the procedures for submitting and processing expense reimbursements.\n\n## Eligible Expenses\n- Business travel expenses\n- Professional development costs\n- Office supplies and equipment\n- Client entertainment (with approval)\n- Conference and training fees\n\n## Submission Requirements\n- Submit expenses within 30 days of purchase\n- Include original receipts for all expenses\n- Provide business justification\n- Use approved expense management system\n- Get manager approval for expenses over $500\n\n## Receipt Requirements\n- Original receipts required for all expenses\n- Receipts must be legible and complete\n- Include date, amount, vendor, and items purchased\n- Submit receipts in digital format when possible\n- Keep copies for your records\n\n## Processing Timeline\n- Expenses submitted by 5 PM Friday processed by following Friday\n- Direct deposit to employee bank account\n- Email notification when payment is processed\n- Contact Finance team for payment issues\n\n## Non-Reimbursable Expenses\n- Personal expenses\n- Alcohol (unless client entertainment)\n- Personal entertainment\n- Traffic violations and parking tickets\n- Personal phone or internet charges",
+      "category": "Finance",
+      "author": "Finance Department",
+      "createdDate": "2024-01-30T13:00:00.000Z",
+      "updatedDate": "2024-01-30T13:00:00.000Z",
+      "tags": [
+        "expenses",
+        "reimbursement",
+        "travel",
+        "receipts",
+        "finance"
+      ],
+      "version": 1,
+      "isPublic": true,
+      "allowedEditors": [
+        "finance-admin"
+      ]
+    },
+    {
+      "id": "engineering-best-practices",
+      "title": "Engineering Best Practices",
+      "content": "This document outlines the coding standards and best practices for Atko's engineering team.\n\n## Code Standards\n- Follow language-specific style guides\n- Use meaningful variable and function names\n- Write self-documenting code\n- Keep functions small and focused\n- Use consistent formatting and indentation\n\n## Version Control\n- Use descriptive commit messages\n- Create feature branches for new development\n- Review code before merging\n- Keep commits atomic and focused\n- Use pull requests for all changes\n\n## Testing Requirements\n- Write unit tests for all new code\n- Maintain minimum 80% code coverage\n- Test edge cases and error conditions\n- Run tests before committing code\n- Fix failing tests immediately\n\n## Documentation\n- Document all public APIs and interfaces\n- Keep README files updated\n- Document complex algorithms and business logic\n- Include setup and deployment instructions\n- Maintain architecture documentation\n\n## Code Review Process\n- All code must be reviewed by at least one peer\n- Address all review comments before merging\n- Use constructive feedback\n- Focus on code quality and maintainability\n- Approve only when satisfied with changes",
+      "category": "Department",
+      "author": "Engineering Team",
+      "createdDate": "2024-02-05T10:00:00.000Z",
+      "updatedDate": "2024-02-05T10:00:00.000Z",
+      "tags": [
+        "engineering",
+        "coding",
+        "best-practices",
+        "code-review",
+        "testing"
+      ],
+      "version": 1,
+      "isPublic": true,
+      "allowedEditors": [
+        "engineering-admin",
+        "tech-lead"
+      ]
+    },
+    {
+      "id": "mission-values",
+      "title": "Atko Mission and Values",
+      "content": "Our mission and values guide everything we do at Atko Corporation.\n\n## Mission Statement\nTo empower organizations through innovative technology solutions while fostering a culture of collaboration, integrity, and continuous improvement.\n\n## Core Values\n\n### Innovation\nWe embrace creativity and new ideas, constantly pushing boundaries to deliver cutting-edge solutions that solve real-world problems.\n\n### Collaboration\nWe believe that the best results come from working together. We value diverse perspectives and foster an environment where every voice is heard.\n\n### Integrity\nWe operate with honesty, transparency, and ethical behavior in all our interactions with customers, partners, and each other.\n\n### Excellence\nWe strive for the highest quality in everything we do, from our products and services to our customer relationships and internal processes.\n\n### Customer Focus\nWe put our customers first, understanding their needs and delivering solutions that exceed their expectations.\n\n### Continuous Learning\nWe encourage personal and professional growth, supporting our employees' development and staying current with industry trends.\n\n## Our Commitment\nWe are committed to creating a workplace where employees feel valued, supported, and empowered to do their best work. We believe that by living our values, we can achieve our mission and make a positive impact on the world.",
+      "category": "Company",
+      "author": "Executive Team",
+      "createdDate": "2024-01-01T00:00:00.000Z",
+      "updatedDate": "2024-01-01T00:00:00.000Z",
+      "tags": [
+        "mission",
+        "values",
+        "culture",
+        "company",
+        "leadership"
+      ],
+      "version": 1,
+      "isPublic": true,
+      "allowedEditors": [
+        "executive-team"
+      ]
+    },
+    {
+      "id": "doc_1755389540057_ck7m5o0zo",
+      "title": "Updated Test Document",
+      "content": "This document has been updated via API.",
+      "category": "IT",
+      "author": "API Tester",
+      "createdDate": "2025-08-17T00:12:20.057Z",
+      "updatedDate": "2025-08-17T00:13:19.224Z",
+      "tags": [
+        "test",
+        "api",
+        "updated",
+        "success"
+      ],
+      "version": 2,
+      "isPublic": true,
+      "allowedEditors": []
+    },
+    {
+      "id": "doc_1755390941582_ucfehx8jf",
+      "title": "MCP Test Document",
+      "content": "This document was created by the MCP server test script.",
+      "category": "IT",
+      "author": "MCP Test",
+      "createdDate": "2025-08-17T00:35:41.582Z",
+      "updatedDate": "2025-08-17T00:35:41.582Z",
+      "tags": [
+        "test",
+        "mcp",
+        "automation"
+      ],
+      "version": 1,
+      "isPublic": true,
+      "allowedEditors": []
+    },
+    {
+      "id": "doc_1755391895621_00kvyd66l",
+      "title": "MCP Integration Test",
+      "content": "This document was created via the MCP server to test the HTTP transport integration.",
+      "category": "IT",
+      "author": "MCP Server",
+      "createdDate": "2025-08-17T00:51:35.621Z",
+      "updatedDate": "2025-08-17T00:51:35.621Z",
+      "tags": [
+        "test",
+        "mcp",
+        "integration"
+      ],
+      "version": 1,
+      "isPublic": true,
+      "allowedEditors": []
+    },
+    {
+      "id": "doc_1755391947272_m6b86o6d",
+      "title": "HTTP MCP Test Document",
+      "content": "This document demonstrates the HTTP-based MCP tool integration. The Employee Assistant can now communicate with the document database through the MCP server using standard HTTP requests.",
+      "category": "IT",
+      "author": "MCP Test Suite",
+      "createdDate": "2025-08-17T00:52:27.272Z",
+      "updatedDate": "2025-08-17T00:52:27.272Z",
+      "tags": [
+        "mcp",
+        "http",
+        "integration",
+        "test"
+      ],
+      "version": 1,
+      "isPublic": true,
+      "allowedEditors": []
+    },
+    {
+      "id": "doc_1755392704110_8equ9f9qb",
+      "title": "our new vacation policy changes for 2025",
+      "content": "User Request: Create document about our new vacation policy changes for 2025\n\nAssistant Response: Of course, I'd be happy to outline a draft for the new vacation policy changes for 2025 at the Atko Corporation. Here it is:\n\n---\n\n## Document: Atko Corporation Vacation Policy Changes 2025\n\n### 1. Vacation Accumulation\nEmployees will now accumulate vacation days at a rate of 1.5 days per month of full-time employment, up from 1.25 days.\n\n### 2. Carry-Over\nThe carry-over limit of unused vacation days at year-end increases to 15 days from 10 days. Any days beyond this limit will be forfeited.\n\n### 3. Unscheduled Vacations\nUnscheduled vacation requests may be submitted no less than two weeks in advance and will be granted depending on business needs and the team's coverage.\n\n### 4. Mandatory Time Off\nEach employee will have to take at least five consecutive vacation days annually to ensure they rest and detach from work for wellness.\n\n### 5. Vacation Segment\nVacation time can now be taken in half-day increments to increase flexibility.\n\n### 6. Bereavement Leave\nBereavement leave is now separate from vacation days policy. Specific details can be found in the \"Atko Bereavement Leave Policy\".\n\nPlease note that these changes supersede all prior vacation policies. For more detailed information, please refer to the updated \"Atko Employee Handbook\".\n\n---\n\nShall I save this draft and notify the HR Department for further input and final approval of the \"Atko Corporation Vacation Policy Changes 2025\"?",
+      "category": "Company",
+      "author": "Employee Assistant",
+      "createdDate": "2025-08-17T01:05:04.110Z",
+      "updatedDate": "2025-08-17T01:05:04.110Z",
+      "tags": [
+        "ai-generated",
+        "employee-request"
+      ],
+      "version": 1,
+      "isPublic": true,
+      "allowedEditors": []
+    }
+  ]
+}

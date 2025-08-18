@@ -1,0 +1,6 @@
+{
+  "env": {
+    "MCP_RESOURCE_SERVER_URL": "@mcp_resource_server_url",
+    "MCP_AUTH_SERVER_URL": "@mcp_auth_server_url"
+  }
+} 

@@ -1,0 +1,27 @@
+{
+  "functions": {
+    "app/**": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "NEXTAUTH_URL": "@nextauth_url",
+    "NEXTAUTH_SECRET": "@nextauth_secret",
+    "OKTA_ISSUER": "@okta_issuer",
+    "OKTA_CLIENT_ID": "@okta_client_id",
+    "OKTA_CLIENT_SECRET": "@okta_client_secret",
+    "OPENAI_API_KEY": "@openai_api_key",
+    "MCP_SERVER_URL": "@mcp_server_url",
+    "MCP_AUTH_SERVER_URL": "@mcp_auth_server_url",
+    "OKTA_BASE_URL": "@okta_base_url",
+    "NEXT_PUBLIC_OKTA_BASE_URL": "@next_public_okta_base_url",
+    "ID_JAG_AUDIENCE": "@id_jag_audience",
+    "ID_JAG_CLIENT_ID": "@id_jag_client_id",
+    "ID_JAG_CLIENT_SECRET": "@id_jag_client_secret"
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  }
+} 
