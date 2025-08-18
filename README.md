@@ -36,14 +36,14 @@ graph TB
     MCP_PROXY -->|Route /mcp/*| MCP_RESOURCE
     MCP_PROXY -->|Route /mcp/auth/*| MCP_AUTH
 
-    style EA fill:#e1f5fe
-    style DD fill:#e1f5fe
-    style MCP_PROXY fill:#fff3e0
-    style MCP_AUTH fill:#fff3e0
-    style MCP_RESOURCE fill:#fff3e0
-    style OKTA fill:#f3e5f5
-    style OPENAI fill:#f3e5f5
-    style CAA_SDK fill:#e8f5e8
+    style EA fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#000000
+    style DD fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#000000
+    style MCP_PROXY fill:#fff3e0,stroke:#ff9800,stroke-width:2px,color:#000000
+    style MCP_AUTH fill:#fff3e0,stroke:#ff9800,stroke-width:2px,color:#000000
+    style MCP_RESOURCE fill:#fff3e0,stroke:#ff9800,stroke-width:2px,color:#000000
+    style OKTA fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px,color:#000000
+    style OPENAI fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px,color:#000000
+    style CAA_SDK fill:#e8f5e8,stroke:#4caf50,stroke-width:2px,color:#000000
 ```
 
 ## 🔐 Authentication Flow
@@ -173,12 +173,12 @@ graph LR
 
     CUSTOM -.->|Optional Routing| MCP_PROXY_V
 
-    style EA_V fill:#e1f5fe
-    style DD_V fill:#e1f5fe
-    style MCP_AUTH_V fill:#fff3e0
-    style MCP_RESOURCE_V fill:#fff3e0
-    style MCP_PROXY_V fill:#fff3e0
-    style CUSTOM fill:#f3e5f5
+    style EA_V fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#000000
+    style DD_V fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#000000
+    style MCP_AUTH_V fill:#fff3e0,stroke:#ff9800,stroke-width:2px,color:#000000
+    style MCP_RESOURCE_V fill:#fff3e0,stroke:#ff9800,stroke-width:2px,color:#000000
+    style MCP_PROXY_V fill:#fff3e0,stroke:#ff9800,stroke-width:2px,color:#000000
+    style CUSTOM fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px,color:#000000
 ```
 
 ## 🔧 Key Technologies
