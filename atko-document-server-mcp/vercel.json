@@ -1,22 +1,16 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "src/index.ts",
-      "use": "@vercel/node"
+  "functions": {
+    "src/index.ts": {
+      "maxDuration": 30
     }
-  ],
+  },
   "routes": [
     {
       "src": "/mcp/(.*)",
       "dest": "/src/index.ts"
     }
   ],
-  "functions": {
-    "src/index.ts": {
-      "maxDuration": 30
-    }
-  },
   "env": {
     "DOCUMENT_DATABASE_URL": "@document_database_url",
     "JWT_SECRET": "@jwt_secret",
