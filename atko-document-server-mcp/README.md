@@ -36,6 +36,27 @@ npm run dev    # Start with auto-reload
 npm start      # Start the HTTP server
 ```
 
+## 🔧 Configuration
+
+### Environment Variables
+Create a `.env` file in the project root with the following variables:
+
+```bash
+# Server Configuration
+PORT=3002
+
+# Document Database URL
+DOCUMENT_DATABASE_URL=http://localhost:3001/api
+
+# JWT Secret for token verification (shared with MCP Auth Server)
+JWT_SECRET=your-long-random-jwt-secret-here
+
+# Node Environment
+NODE_ENV=development
+```
+
+**Important**: The `JWT_SECRET` must match the one used in the MCP Auth Server for token verification to work properly.
+
 ## 🔧 HTTP API Endpoints
 
 ### Server Information
