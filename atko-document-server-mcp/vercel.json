@@ -12,8 +12,6 @@
     }
   ],
   "env": {
-    "DOCUMENT_DATABASE_URL": "@document_database_url",
-    "JWT_SECRET": "@jwt_secret",
     "NODE_ENV": "production"
   }
 } 
