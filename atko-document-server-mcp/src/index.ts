@@ -44,7 +44,8 @@ app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy', 
     timestamp: new Date().toISOString(),
-    documentDatabase: 'connected'
+    environment: process.env.NODE_ENV || 'development',
+    documentDatabase: process.env.DOCUMENT_DATABASE_URL ? 'configured' : 'not configured'
   });
 });
 
@@ -90,6 +91,14 @@ async function handleSearchDocuments(args: any, res: express.Response) {
       return res.status(400).json({
         error: 'Missing parameters',
         message: 'At least one search parameter (query, category, author, or tags) is required'
+      });
+    }
+
+    // Check if document database is configured
+    if (!process.env.DOCUMENT_DATABASE_URL) {
+      return res.status(503).json({
+        error: 'Service unavailable',
+        message: 'Document database URL not configured'
       });
     }
 
@@ -139,6 +148,14 @@ async function handleCreateDocument(args: any, res: express.Response) {
       return res.status(400).json({
         error: 'Missing required parameters',
         message: 'title, content, category, and author are required'
+      });
+    }
+
+    // Check if document database is configured
+    if (!process.env.DOCUMENT_DATABASE_URL) {
+      return res.status(503).json({
+        error: 'Service unavailable',
+        message: 'Document database URL not configured'
       });
     }
 
@@ -235,40 +252,51 @@ app.use((req, res) => {
   });
 });
 
-async function main() {
-  // Test connection to document database
-  console.log('🔗 Testing connection to document database...');
-  const isConnected = await documentClient.testConnection();
-  
-  if (!isConnected) {
-    const dbUrl = process.env.DOCUMENT_DATABASE_URL || 'http://localhost:3001/api';
-    console.error(`❌ Failed to connect to document database at ${dbUrl}`);
-    console.error('💡 Make sure the internal-document-database is running and accessible');
-    process.exit(1);
+// For Vercel serverless deployment, export the app
+export default app;
+
+// Add startup logging for serverless environment
+console.log('🚀 Atko Document Server MCP initializing...');
+console.log(`📡 Environment: ${process.env.NODE_ENV || 'development'}`);
+console.log(`🔗 Document Database URL: ${process.env.DOCUMENT_DATABASE_URL || 'http://localhost:3001/api'}`);
+
+// For local development, start the server
+if (process.env.NODE_ENV !== 'production') {
+  async function main() {
+    // Test connection to document database
+    console.log('🔗 Testing connection to document database...');
+    const isConnected = await documentClient.testConnection();
+    
+    if (!isConnected) {
+      const dbUrl = process.env.DOCUMENT_DATABASE_URL || 'http://localhost:3001/api';
+      console.error(`❌ Failed to connect to document database at ${dbUrl}`);
+      console.error('💡 Make sure the internal-document-database is running and accessible');
+      process.exit(1);
+    }
+    
+    console.log('✅ Connected to document database successfully');
+
+    // Start HTTP server
+    app.listen(PORT, () => {
+      console.log('🚀 Atko Document Server MCP ready');
+      console.log(`📡 HTTP Server listening on port ${PORT}`);
+      console.log('🔗 Endpoints:');
+      console.log(`   • GET  http://localhost:${PORT}/info - Server info`);
+      console.log(`   • GET  http://localhost:${PORT}/health - Health check`);
+      console.log(`   • GET  http://localhost:${PORT}/tools - List available tools`);
+      console.log(`   • POST http://localhost:${PORT}/tools/call - Execute MCP tools`);
+      console.log('');
+      console.log('📚 Available MCP tools:');
+      console.log('   • search_documents - Search for documents');
+      console.log('   • create_document - Create new documents');
+      console.log('');
+      console.log('💡 This server implements the MCP Streamable HTTP protocol');
+      console.log('   Ready for integration with the Employee Assistant');
+    });
   }
-  
-  console.log('✅ Connected to document database successfully');
 
-  // Start HTTP server
-  app.listen(PORT, () => {
-    console.log('🚀 Atko Document Server MCP ready');
-    console.log(`📡 HTTP Server listening on port ${PORT}`);
-    console.log('🔗 Endpoints:');
-    console.log(`   • GET  http://localhost:${PORT}/info - Server info`);
-    console.log(`   • GET  http://localhost:${PORT}/health - Health check`);
-    console.log(`   • GET  http://localhost:${PORT}/tools - List available tools`);
-    console.log(`   • POST http://localhost:${PORT}/tools/call - Execute MCP tools`);
-    console.log('');
-    console.log('📚 Available MCP tools:');
-    console.log('   • search_documents - Search for documents');
-    console.log('   • create_document - Create new documents');
-    console.log('');
-    console.log('💡 This server implements the MCP Streamable HTTP protocol');
-    console.log('   Ready for integration with the Employee Assistant');
+  main().catch((error) => {
+    console.error('❌ Server startup error:', error);
+    process.exit(1);
   });
-}
-
-main().catch((error) => {
-  console.error('❌ Server startup error:', error);
-  process.exit(1);
-}); 
+} 
