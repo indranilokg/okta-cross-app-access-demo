@@ -1,13 +1,14 @@
 {
   "version": 2,
-  "functions": {
-    "src/index.ts": {
-      "maxDuration": 30
+  "builds": [
+    {
+      "src": "src/index.ts",
+      "use": "@vercel/node"
     }
-  },
+  ],
   "routes": [
     {
-      "src": "/mcp/(.*)",
+      "src": "/(.*)",
       "dest": "/src/index.ts"
     }
   ],
