@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import { mcpClient } from '@/utils/mcpClient';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,

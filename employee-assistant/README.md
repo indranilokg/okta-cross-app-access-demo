@@ -84,12 +84,71 @@ employee-assistant/
 
 ## Environment Variables
 
+### Required for Production
+Configure these environment variables in your Vercel dashboard:
+
 | Variable | Description | Required |
 |----------|-------------|----------|
+| `NEXTAUTH_URL` | Your deployed app URL (e.g., https://your-app.vercel.app) | Yes |
+| `NEXTAUTH_SECRET` | A long, random secret for NextAuth.js | Yes |
+| `OKTA_ISSUER` | Your Okta domain URL | Yes |
+| `OKTA_CLIENT_ID` | Okta OIDC client ID | Yes |
+| `OKTA_CLIENT_SECRET` | Okta OIDC client secret | Yes |
 | `OPENAI_API_KEY` | OpenAI API key for GPT-4 access | Yes |
-| `AUTH_ISSUER` | Authentication provider URL | Phase 2 |
-| `AUTH_CLIENT_ID` | Authentication client ID | Phase 2 |
-| `AUTH_CLIENT_SECRET` | Authentication client secret | Phase 2 |
+| `MCP_SERVER_URL` | MCP Document Server URL (via proxy) | Yes |
+| `MCP_AUTH_SERVER_URL` | MCP Auth Server URL (via proxy) | Yes |
+| `OKTA_BASE_URL` | Okta base URL for ID-JAG token exchange | Yes |
+| `NEXT_PUBLIC_OKTA_BASE_URL` | Public Okta URL (same as OKTA_BASE_URL) | Yes |
+| `ID_JAG_AUDIENCE` | ID-JAG token audience | Yes |
+| `ID_JAG_CLIENT_ID` | ID-JAG client ID (same as OKTA_CLIENT_ID) | Yes |
+| `ID_JAG_CLIENT_SECRET` | ID-JAG client secret (same as OKTA_CLIENT_SECRET) | Yes |
+
+### Example Configuration
+```bash
+# NextAuth Configuration
+NEXTAUTH_URL=https://your-employee-assistant.vercel.app
+NEXTAUTH_SECRET=your-long-random-nextauth-secret
+
+# Okta Configuration
+OKTA_ISSUER=https://your-domain.okta.com
+OKTA_CLIENT_ID=your_okta_client_id
+OKTA_CLIENT_SECRET=your_okta_client_secret
+
+# OpenAI Configuration
+OPENAI_API_KEY=your_openai_api_key
+
+# MCP Server URLs (via proxy)
+MCP_SERVER_URL=https://your-mcp-proxy.vercel.app/mcp
+MCP_AUTH_SERVER_URL=https://your-mcp-proxy.vercel.app/mcp/auth
+
+# ID-JAG Configuration
+OKTA_BASE_URL=https://your-domain.okta.com
+NEXT_PUBLIC_OKTA_BASE_URL=https://your-domain.okta.com
+ID_JAG_AUDIENCE=https://your-mcp-audience
+ID_JAG_CLIENT_ID=your_okta_client_id
+ID_JAG_CLIENT_SECRET=your_okta_client_secret
+```
+
+## 🚀 Deployment
+
+### Vercel Deployment
+1. **Connect Repository**: Link your GitHub repository to Vercel
+2. **Configure Environment Variables**: Set all required environment variables in Vercel dashboard
+3. **Deploy**: Vercel will automatically build and deploy the application
+
+### Environment Variables in Vercel
+- Go to your Vercel project dashboard
+- Navigate to **Settings** → **Environment Variables**
+- Add all the required environment variables listed above
+- Set them for **Production** environment
+- Redeploy the application
+
+### Prerequisites for Deployment
+- ✅ Deployed MCP Document Server
+- ✅ Deployed MCP Auth Server  
+- ✅ Deployed MCP Proxy
+- ✅ Configured Okta OIDC application
+- ✅ OpenAI API key
 
 ## License
 
