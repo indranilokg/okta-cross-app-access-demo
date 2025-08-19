@@ -73,6 +73,8 @@ Health check endpoint with supported token information.
 ## Configuration
 
 ### Environment Variables
+Create a `.env` file in the project root with the following variables:
+
 ```bash
 # Okta Configuration
 OKTA_ISSUER=https://your-domain.oktapreview.com
@@ -97,12 +99,15 @@ JWT_SECRET=your-secret-key-for-mcp-tokens
    npm install
    ```
 
-2. **Build TypeScript**
+2. **Configure Environment**
+   Create a `.env` file based on `env.local.template` with your actual values.
+
+3. **Build TypeScript**
    ```bash
    npm run build
    ```
 
-3. **Start Server**
+4. **Start Server**
    ```bash
    npm run dev
    ```
