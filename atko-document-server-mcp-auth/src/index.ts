@@ -172,19 +172,39 @@ app.get('/health', (req, res) => {
     status: 'ok',
     service: 'atko-mcp-auth-server',
     timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
     supported_tokens: ['ID-JAG'],
-    audience: ID_JAG_AUDIENCE
+    audience: ID_JAG_AUDIENCE,
+    okta_issuer: OKTA_ISSUER
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Atko MCP Auth Server running on port ${PORT}`);
-  console.log(`📝 POST /oauth/token - Generate access token (ID-JAG tokens only)`);
-  console.log(`💚 GET /health - Health check`);
-  console.log(`🎯 Expected ID-JAG audience: ${ID_JAG_AUDIENCE}`);
-  console.log(`📍 Okta issuer: ${OKTA_ISSUER}`);
-  console.log('⚠️  Legacy ID tokens are no longer supported');
-});
+// For Vercel serverless deployment, export the app
+export default app;
 
-export { app }; 
+// Add startup logging for serverless environment
+console.log('🚀 Atko MCP Auth Server initializing...');
+console.log(`📡 Environment: ${process.env.NODE_ENV || 'development'}`);
+console.log(`🎯 ID-JAG Audience: ${ID_JAG_AUDIENCE}`);
+console.log(`📍 Okta Issuer: ${OKTA_ISSUER}`);
+
+// For local development, start the server
+if (process.env.NODE_ENV !== 'production') {
+  // Start server
+  app.listen(PORT, () => {
+    console.log(`🚀 Atko MCP Auth Server running on port ${PORT}`);
+    console.log(`📝 POST /oauth/token - Generate access token (ID-JAG tokens only)`);
+    console.log(`💚 GET /health - Health check`);
+    console.log(`🎯 Expected ID-JAG audience: ${ID_JAG_AUDIENCE}`);
+    console.log(`📍 Okta issuer: ${OKTA_ISSUER}`);
+    console.log('⚠️  Legacy ID tokens are no longer supported');
+    
+    // Show configuration status
+    if (OKTA_ISSUER === 'https://your-domain.okta.com') {
+      console.warn('⚠️  Please configure OKTA_ISSUER in your .env file');
+    }
+    if (ID_JAG_AUDIENCE === 'http://localhost:5001') {
+      console.warn('⚠️  Please configure ID_JAG_AUDIENCE in your .env file');
+    }
+  });
+} 

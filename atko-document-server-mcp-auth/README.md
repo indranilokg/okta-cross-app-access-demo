@@ -112,6 +112,30 @@ JWT_SECRET=your-secret-key-for-mcp-tokens
    npm run dev
    ```
 
+## 🔧 Configuration
+
+### Environment Variables
+Create a `.env` file in the project root with the following variables:
+
+```bash
+# Server Configuration
+PORT=3003
+
+# Okta Configuration
+OKTA_ISSUER=https://your-domain.oktapreview.com
+
+# ID-JAG Configuration
+ID_JAG_AUDIENCE=http://localhost:5001
+
+# JWT Secret for signing MCP access tokens (shared with MCP Document Server)
+JWT_SECRET=your-secret-key-for-mcp-tokens
+
+# Node Environment
+NODE_ENV=development
+```
+
+**Important**: The `JWT_SECRET` must match the one used in the MCP Document Server for token verification to work properly.
+
 ## Testing
 
 ### Comprehensive Test

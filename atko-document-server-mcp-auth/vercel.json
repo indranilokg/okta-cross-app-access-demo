@@ -8,19 +8,11 @@
   ],
   "routes": [
     {
-      "src": "/mcp/auth/(.*)",
+      "src": "/(.*)",
       "dest": "/src/index.ts"
     }
   ],
-  "functions": {
-    "src/index.ts": {
-      "maxDuration": 30
-    }
-  },
   "env": {
-    "JWT_SECRET": "@jwt_secret",
-    "OKTA_ISSUER": "@okta_issuer",
-    "ID_JAG_AUDIENCE": "@id_jag_audience",
     "NODE_ENV": "production"
   }
 } 
