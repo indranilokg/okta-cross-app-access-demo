@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getCategories } from '@/utils/documentService';
 import { ApiResponse } from '@/types/document';
 
 // GET /api/categories - Get all categories
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const categories = getCategories();
 

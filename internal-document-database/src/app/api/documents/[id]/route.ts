@@ -5,10 +5,11 @@ import { DocumentUpdateRequest, ApiResponse } from '@/types/document';
 // GET /api/documents/[id] - Get specific document
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
-    const document = getDocumentById(params.id);
+    const document = getDocumentById(id);
 
     if (!document) {
       const response: ApiResponse<null> = {
@@ -37,13 +38,14 @@ export async function GET(
 // PUT /api/documents/[id] - Update document
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const body: DocumentUpdateRequest = await request.json();
 
     // Check if document exists
-    const existingDocument = getDocumentById(params.id);
+    const existingDocument = getDocumentById(id);
     if (!existingDocument) {
       const response: ApiResponse<null> = {
         success: false,
@@ -64,7 +66,7 @@ export async function PUT(
       }
     }
 
-    const updatedDocument = updateDocument(params.id, body);
+    const updatedDocument = updateDocument(id, body);
 
     if (!updatedDocument) {
       const response: ApiResponse<null> = {
@@ -94,11 +96,12 @@ export async function PUT(
 // DELETE /api/documents/[id] - Delete document
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     // Check if document exists
-    const existingDocument = getDocumentById(params.id);
+    const existingDocument = getDocumentById(id);
     if (!existingDocument) {
       const response: ApiResponse<null> = {
         success: false,
@@ -107,7 +110,7 @@ export async function DELETE(
       return NextResponse.json(response, { status: 404 });
     }
 
-    const success = deleteDocument(params.id);
+    const success = deleteDocument(id);
 
     if (!success) {
       const response: ApiResponse<null> = {
