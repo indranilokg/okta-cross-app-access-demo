@@ -97,7 +97,8 @@ Configure these environment variables in your Vercel dashboard:
 | `OPENAI_API_KEY` | OpenAI API key for GPT-4 access | Yes |
 | `MCP_SERVER_URL` | MCP Document Server URL (via proxy) | Yes |
 | `MCP_AUTH_SERVER_URL` | MCP Auth Server URL (via proxy) | Yes |
-| `OKTA_BASE_URL` | Okta base URL for ID-JAG token exchange and public access | Yes |
+| `OKTA_BASE_URL` | Okta base URL for ID-JAG token exchange | Yes |
+| `NEXT_PUBLIC_OKTA_BASE_URL` | Okta base URL for client-side access (logout) | Yes |
 | `ID_JAG_AUDIENCE` | ID-JAG token audience | Yes |
 | `ID_JAG_CLIENT_ID` | ID-JAG client ID (same as OKTA_CLIENT_ID) | Yes |
 | `ID_JAG_CLIENT_SECRET` | ID-JAG client secret (same as OKTA_CLIENT_SECRET) | Yes |
@@ -122,6 +123,7 @@ MCP_AUTH_SERVER_URL=https://your-mcp-proxy.vercel.app/mcp/auth
 
 # ID-JAG Configuration
 OKTA_BASE_URL=https://your-domain.okta.com
+NEXT_PUBLIC_OKTA_BASE_URL=https://your-domain.okta.com
 ID_JAG_AUDIENCE=https://your-mcp-audience
 ID_JAG_CLIENT_ID=your_okta_client_id
 ID_JAG_CLIENT_SECRET=your_okta_client_secret
