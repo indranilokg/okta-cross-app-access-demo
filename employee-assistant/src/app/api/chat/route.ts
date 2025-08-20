@@ -3,9 +3,15 @@ import { mcpClient } from '@/utils/mcpClient';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize OpenAI client lazily to avoid build-time environment variable issues
+function getOpenAIClient() {
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error('OPENAI_API_KEY environment variable is required');
+  }
+  return new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+}
 
 export async function POST(req: Request) {
   // Get user session for authentication
@@ -72,6 +78,7 @@ export async function POST(req: Request) {
     }
   }
 
+  const openai = getOpenAIClient();
   const response = await openai.chat.completions.create({
     model: 'gpt-4',
     messages: [
