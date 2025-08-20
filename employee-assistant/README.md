@@ -93,6 +93,7 @@ Configure these environment variables in your Vercel dashboard:
 | `NEXTAUTH_SECRET` | A long, random secret for NextAuth.js | Yes |
 | `OKTA_ISSUER` | Your Okta domain URL | Yes |
 | `OKTA_CLIENT_ID` | Okta OIDC client ID | Yes |
+| `NEXT_PUBLIC_OKTA_CLIENT_ID` | Okta client ID for client-side logout | Yes |
 | `OKTA_CLIENT_SECRET` | Okta OIDC client secret | Yes |
 | `OPENAI_API_KEY` | OpenAI API key for GPT-4 access | Yes |
 | `MCP_SERVER_URL` | MCP Document Server URL (via proxy) | Yes |
@@ -112,6 +113,7 @@ NEXTAUTH_SECRET=your-long-random-nextauth-secret
 # Okta Configuration
 OKTA_ISSUER=https://your-domain.okta.com
 OKTA_CLIENT_ID=your_okta_client_id
+NEXT_PUBLIC_OKTA_CLIENT_ID=your_okta_client_id
 OKTA_CLIENT_SECRET=your_okta_client_secret
 
 # OpenAI Configuration

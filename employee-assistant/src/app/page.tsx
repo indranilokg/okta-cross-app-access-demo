@@ -164,10 +164,20 @@ export default function EmployeeAssistant() {
       callbackUrl: '/',
       redirect: false 
     }).then(() => {
-      // Then redirect to Okta logout
-      const oktaBaseUrl = process.env.NEXT_PUBLIC_OKTA_BASE_URL || 'https://ijtestcustom.oktapreview.com';
-      const oktaLogoutUrl = `${oktaBaseUrl}/login/signout?fromURI=${encodeURIComponent(window.location.origin)}`;
-      window.location.href = oktaLogoutUrl;
+      // Then redirect to Okta logout with proper parameters
+      const oktaBaseUrl = process.env.NEXT_PUBLIC_OKTA_BASE_URL || 'https://your-domain.okta.com';
+      const clientId = process.env.NEXT_PUBLIC_OKTA_CLIENT_ID;
+      const postLogoutRedirectUri = encodeURIComponent(window.location.origin);
+      
+      // Use OIDC logout endpoint if client ID is available
+      if (clientId) {
+        const oktaLogoutUrl = `${oktaBaseUrl}/oauth2/v1/logout?client_id=${clientId}&post_logout_redirect_uri=${postLogoutRedirectUri}`;
+        window.location.href = oktaLogoutUrl;
+      } else {
+        // Fallback to basic logout
+        const oktaLogoutUrl = `${oktaBaseUrl}/login/signout?fromURI=${postLogoutRedirectUri}`;
+        window.location.href = oktaLogoutUrl;
+      }
     });
   };
 
