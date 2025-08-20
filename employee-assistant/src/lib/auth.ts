@@ -1,37 +1,9 @@
 import NextAuth from "next-auth";
 import OktaProvider from "next-auth/providers/okta";
 
-// Validate required environment variables at runtime only
-function validateEnvVars() {
-  const requiredEnvVars = {
-    OKTA_CLIENT_ID: process.env.OKTA_CLIENT_ID,
-    OKTA_CLIENT_SECRET: process.env.OKTA_CLIENT_SECRET,
-    OKTA_ISSUER: process.env.OKTA_ISSUER,
-    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-  };
 
-  // Check for missing environment variables
-  const missingVars = Object.entries(requiredEnvVars)
-    .filter(([_, value]) => !value)
-    .map(([key]) => key);
 
-  if (missingVars.length > 0) {
-    throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
-  }
 
-  return requiredEnvVars;
-}
-
-// Validate environment variables at runtime
-if (typeof window === 'undefined') { // Only run on server side
-  try {
-    validateEnvVars();
-  } catch (error) {
-    console.error('❌ Environment validation failed:', error instanceof Error ? error.message : 'Unknown error');
-    // Don't throw during build, only log the error
-  }
-}
 
 export const authOptions = {
   providers: [
