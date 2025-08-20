@@ -165,7 +165,7 @@ export default function EmployeeAssistant() {
       redirect: false 
     }).then(() => {
       // Then redirect to Okta logout
-      const oktaBaseUrl = process.env.NEXT_PUBLIC_OKTA_BASE_URL || 'https://your-domain.okta.com';
+      const oktaBaseUrl = process.env.OKTA_BASE_URL || 'https://your-domain.okta.com';
       const oktaLogoutUrl = `${oktaBaseUrl}/login/signout?fromURI=${encodeURIComponent(window.location.origin)}`;
       window.location.href = oktaLogoutUrl;
     });
