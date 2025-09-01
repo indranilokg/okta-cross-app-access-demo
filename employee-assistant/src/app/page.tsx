@@ -167,15 +167,20 @@ export default function EmployeeAssistant() {
       // Then redirect to Okta logout with proper parameters
       const oktaBaseUrl = process.env.NEXT_PUBLIC_OKTA_BASE_URL || 'https://your-domain.okta.com';
       const clientId = process.env.NEXT_PUBLIC_OKTA_CLIENT_ID;
-      const postLogoutRedirectUri = encodeURIComponent(window.location.origin);
       
-      // Use OIDC logout endpoint if client ID is available
-      if (clientId) {
+      // Use OIDC logout with id_token_hint if available
+      if (clientId && session?.idToken) {
+        const postLogoutRedirectUri = encodeURIComponent(`${oktaBaseUrl}/login/signout`);
+        const oktaLogoutUrl = `${oktaBaseUrl}/oauth2/v1/logout?id_token_hint=${session.idToken}&post_logout_redirect_uri=${postLogoutRedirectUri}`;
+        window.location.href = oktaLogoutUrl;
+      } else if (clientId) {
+        // Fallback to client_id based logout
+        const postLogoutRedirectUri = encodeURIComponent(`${oktaBaseUrl}/login/signout`);
         const oktaLogoutUrl = `${oktaBaseUrl}/oauth2/v1/logout?client_id=${clientId}&post_logout_redirect_uri=${postLogoutRedirectUri}`;
         window.location.href = oktaLogoutUrl;
       } else {
         // Fallback to basic logout
-        const oktaLogoutUrl = `${oktaBaseUrl}/login/signout?fromURI=${postLogoutRedirectUri}`;
+        const oktaLogoutUrl = `${oktaBaseUrl}/login/signout`;
         window.location.href = oktaLogoutUrl;
       }
     });
