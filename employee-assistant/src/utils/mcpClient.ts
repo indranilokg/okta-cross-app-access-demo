@@ -24,6 +24,8 @@ export interface DocumentCreateParams {
   isPublic?: boolean;
 }
 
+export type DeploymentMode = 'vercel' | 'lambda';
+
 export class MCPClient {
   private baseUrl: string;
   private authServerUrl: string;
@@ -32,27 +34,104 @@ export class MCPClient {
   private audience: string;
   private clientId: string;
   private clientSecret: string;
+  private deploymentMode: DeploymentMode;
 
   constructor(
-    baseUrl: string = process.env.MCP_SERVER_URL || 'http://localhost:3002',
-    authServerUrl: string = process.env.MCP_AUTH_SERVER_URL || 'http://localhost:3003',
+    baseUrl?: string,
+    authServerUrl?: string,
     oktaBaseUrl: string = process.env.OKTA_BASE_URL || 'https://your-domain.okta.com',
     audience: string = process.env.ID_JAG_AUDIENCE || 'http://localhost:5001',
     clientId: string = process.env.ID_JAG_CLIENT_ID || 'YOUR_CLIENT_ID',
     clientSecret: string = process.env.ID_JAG_CLIENT_SECRET || 'YOUR_CLIENT_SECRET'
   ) {
-    this.baseUrl = baseUrl;
-    this.authServerUrl = authServerUrl;
+    // Detect deployment mode from environment
+    this.deploymentMode = (process.env.MCP_DEPLOYMENT_MODE as DeploymentMode) || 'vercel';
+    
+    if (this.deploymentMode === 'lambda') {
+      // Lambda deployment - direct API Gateway URL (no separate auth server needed)
+      this.baseUrl = baseUrl || process.env.MCP_LAMBDA_URL || 'https://api-gateway-url.amazonaws.com/mcp';
+      this.authServerUrl = ''; // Not used in Lambda mode
+    } else {
+      // Vercel deployment - via proxy or direct
+      this.baseUrl = baseUrl || process.env.MCP_SERVER_URL || 'http://localhost:3002';
+      this.authServerUrl = authServerUrl || process.env.MCP_AUTH_SERVER_URL || 'http://localhost:3003';
+    }
+
     this.oktaBaseUrl = oktaBaseUrl;
     this.audience = audience;
     this.clientId = clientId;
     this.clientSecret = clientSecret;
+
+    console.log(`🚀 MCP Client initialized in ${this.deploymentMode.toUpperCase()} mode`);
+    console.log(`📡 Base URL: ${this.baseUrl}`);
+    if (this.deploymentMode === 'vercel') {
+      console.log(`🔐 Auth URL: ${this.authServerUrl}`);
+    }
   }
 
-  // Get ID-JAG token from Okta using the SDK, then get MCP access token
+  // Get access token based on deployment mode
   async getAccessToken(idToken: string): Promise<{ accessToken: string; idJagToken: string }> {
+    if (this.deploymentMode === 'lambda') {
+      return this.getAccessTokenLambda(idToken);
+    } else {
+      return this.getAccessTokenVercel(idToken);
+    }
+  }
+
+  // Lambda mode: Use ID-JAG token directly (authorization handled by Lambda Authorizer)
+  private async getAccessTokenLambda(idToken: string): Promise<{ accessToken: string; idJagToken: string }> {
     try {
-      console.log('🔄 Step 1: Exchanging Okta ID token for ID-JAG token...');
+      console.log('🔄 Lambda Mode: Exchanging Okta ID token for ID-JAG token...');
+      
+      // Step 1: Use SDK to exchange ID token for ID-JAG token
+      const idJagResponse = await exchangeIdTokenForIdJag({
+        subject_token: idToken,
+        audience: this.audience,
+        client_id: this.clientId,
+        client_secret: this.clientSecret
+      }, this.oktaBaseUrl);
+
+      console.log('✅ ID-JAG token obtained successfully for Lambda mode');
+      console.log('📋 ID-JAG Token Details:');
+      console.log(`  • Token Type: ${idJagResponse.token_type}`);
+      console.log(`  • Issued Token Type: ${idJagResponse.issued_token_type}`);
+      console.log(`  • Expires In: ${idJagResponse.expires_in} seconds`);
+      
+      // Optional: Verify the ID-JAG token
+      console.log('🔍 Verifying ID-JAG token...');
+      const verificationResult = await verifyIdJagToken(idJagResponse.access_token, {
+        issuer: this.oktaBaseUrl,
+        audience: this.audience
+      });
+
+      if (verificationResult.valid) {
+        console.log('✅ ID-JAG token verified successfully');
+        console.log(`  • Subject: ${verificationResult.sub}`);
+        console.log(`  • Audience: ${verificationResult.aud}`);
+        console.log(`  • Issuer: ${verificationResult.iss}`);
+      } else {
+        console.warn('⚠️ ID-JAG token verification failed:', verificationResult.error);
+      }
+
+      // In Lambda mode, we use the ID-JAG token directly
+      // The Lambda Authorizer will handle token verification
+      this.accessToken = idJagResponse.access_token;
+      console.log('🎯 Lambda mode: Using ID-JAG token directly for API calls');
+      
+      return {
+        accessToken: idJagResponse.access_token,
+        idJagToken: idJagResponse.access_token
+      };
+    } catch (error) {
+      console.error('❌ Failed to get ID-JAG token for Lambda mode:', error);
+      throw new Error(`Lambda authentication failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  // Vercel mode: Use existing auth server flow
+  private async getAccessTokenVercel(idToken: string): Promise<{ accessToken: string; idJagToken: string }> {
+    try {
+      console.log('🔄 Vercel Mode: Exchanging Okta ID token for ID-JAG token...');
       
       // Step 1: Use SDK to exchange ID token for ID-JAG token
       const idJagResponse = await exchangeIdTokenForIdJag({
@@ -69,7 +148,7 @@ export class MCPClient {
       console.log(`  • Expires In: ${idJagResponse.expires_in} seconds`);
       
       // Optional: Verify the ID-JAG token
-      console.log('🔍 Step 2: Verifying ID-JAG token...');
+      console.log('🔍 Verifying ID-JAG token...');
       const verificationResult = await verifyIdJagToken(idJagResponse.access_token, {
         issuer: this.oktaBaseUrl,
         audience: this.audience
@@ -84,8 +163,8 @@ export class MCPClient {
         console.warn('⚠️ ID-JAG token verification failed:', verificationResult.error);
       }
 
-      // Step 3: Exchange ID-JAG token for MCP access token
-      console.log('🔄 Step 3: Exchanging ID-JAG token for MCP access token...');
+      // Step 3: Exchange ID-JAG token for MCP access token (Vercel mode only)
+      console.log('🔄 Vercel Mode: Exchanging ID-JAG token for MCP access token...');
       
       const response = await fetch(`${this.authServerUrl}/oauth/token`, {
         method: 'POST',
@@ -113,8 +192,8 @@ export class MCPClient {
         idJagToken: idJagResponse.access_token
       };
     } catch (error) {
-      console.error('❌ Failed to get MCP access token via ID-JAG flow:', error);
-      throw new Error(`ID-JAG authentication failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('❌ Failed to get MCP access token via Vercel flow:', error);
+      throw new Error(`Vercel authentication failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -181,6 +260,19 @@ export class MCPClient {
       console.error('Failed to get available tools:', error);
       throw error;
     }
+  }
+
+  // Get current deployment mode
+  getDeploymentMode(): DeploymentMode {
+    return this.deploymentMode;
+  }
+
+  // Get current URLs
+  getUrls(): { baseUrl: string; authServerUrl: string } {
+    return {
+      baseUrl: this.baseUrl,
+      authServerUrl: this.authServerUrl
+    };
   }
 }
 

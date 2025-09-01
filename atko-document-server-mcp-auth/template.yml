@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Atko MCP Auth Server - SAM Template
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: nodejs18.x
+    Environment:
+      Variables:
+        NODE_ENV: production
+        OKTA_ISSUER: !Ref OktaIssuer
+        ID_JAG_AUDIENCE: !Ref IdJagAudience
+        JWT_SECRET: !Ref JwtSecret
+
+Parameters:
+  JwtSecret:
+    Type: String
+    Description: JWT secret for token signing
+    NoEcho: true
+  
+  OktaIssuer:
+    Type: String
+    Description: Okta issuer URL
+    Default: https://your-domain.okta.com
+  
+  IdJagAudience:
+    Type: String
+    Description: ID-JAG audience
+    Default: http://localhost:5001
+
+Resources:
+  # MCP Authorizer Lambda Function
+  McpAuthorizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/
+      Handler: lambda-authorizer.authorizer
+      Environment:
+        Variables:
+          OKTA_ISSUER: !Ref OktaIssuer
+          ID_JAG_AUDIENCE: !Ref IdJagAudience
+      Policies:
+        - CloudWatchLogsFullAccess
+
+Outputs:
+  McpAuthorizerFunction:
+    Description: MCP Authorizer Lambda Function
+    Value: !Ref McpAuthorizerFunction

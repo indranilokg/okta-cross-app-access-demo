@@ -1,0 +1,11 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "atko-document-server-mcp"
+resolve_s3 = true
+s3_prefix = "atko-document-server-mcp"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "DocumentDatabaseUrl=\"https://atkointernaldocumentdb.vercel.app/api\" OktaIssuer=\"https://ijtestcustom.oktapreview.com\" IdJagAudience=\"http://localhost:5001\""
+image_repositories = []

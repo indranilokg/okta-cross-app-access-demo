@@ -1,0 +1,142 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Atko MCP Document Server - SAM Template
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: nodejs18.x
+    Environment:
+      Variables:
+        NODE_ENV: production
+        DOCUMENT_DATABASE_URL: !Ref DocumentDatabaseUrl
+        JWT_SECRET: !Ref JwtSecret
+        OKTA_ISSUER: !Ref OktaIssuer
+        ID_JAG_AUDIENCE: !Ref IdJagAudience
+
+Parameters:
+  DocumentDatabaseUrl:
+    Type: String
+    Description: URL of the document database
+    Default: http://localhost:3001/api
+  
+  JwtSecret:
+    Type: String
+    Description: JWT secret for token verification
+    NoEcho: true
+  
+  OktaIssuer:
+    Type: String
+    Description: Okta issuer URL
+    Default: https://your-domain.okta.com
+  
+  IdJagAudience:
+    Type: String
+    Description: ID-JAG audience
+    Default: http://localhost:5001
+
+Resources:
+  # MCP Server Lambda Function
+  McpServerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/
+      Handler: lambda.handler
+      Events:
+        # Health check - no auth required
+        HealthEvent:
+          Type: Api
+          Properties:
+            Path: /mcp/health
+            Method: GET
+            RestApiId: !Ref McpPublicApi
+        # Info endpoint - no auth required
+        InfoEvent:
+          Type: Api
+          Properties:
+            Path: /mcp/info
+            Method: GET
+            RestApiId: !Ref McpPublicApi
+        # Tools list - no auth required
+        ToolsEvent:
+          Type: Api
+          Properties:
+            Path: /mcp/tools
+            Method: GET
+            RestApiId: !Ref McpPublicApi
+        # All other endpoints - auth required
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /mcp/{proxy+}
+            Method: ANY
+            RestApiId: !Ref McpProtectedApi
+        ApiRootEvent:
+          Type: Api
+          Properties:
+            Path: /mcp
+            Method: ANY
+            RestApiId: !Ref McpProtectedApi
+      Policies:
+        - CloudWatchLogsFullAccess
+      Environment:
+        Variables:
+          AUTHORIZER_FUNCTION: !GetAtt McpAuthorizerFunction.Arn
+
+  # MCP Authorizer Lambda Function
+  McpAuthorizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/
+      Handler: lambda-authorizer.authorizer
+      Environment:
+        Variables:
+          OKTA_ISSUER: !Ref OktaIssuer
+          ID_JAG_AUDIENCE: !Ref IdJagAudience
+      Policies:
+        - CloudWatchLogsFullAccess
+
+  # API Gateway for public endpoints (no auth)
+  McpPublicApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: "'*'"
+
+  # API Gateway for protected endpoints (with auth)
+  McpProtectedApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: "'*'"
+      Auth:
+        DefaultAuthorizer: McpAuthorizer
+        Authorizers:
+          McpAuthorizer:
+            FunctionArn: !GetAtt McpAuthorizerFunction.Arn
+            Identity:
+              Headers:
+                - Authorization
+
+Outputs:
+  McpPublicApiUrl:
+    Description: URL of the MCP Public API Gateway (no auth required)
+    Value: !Sub "https://${McpPublicApi}.execute-api.${AWS::Region}.amazonaws.com/prod/mcp"
+  
+  McpProtectedApiUrl:
+    Description: URL of the MCP Protected API Gateway (auth required)
+    Value: !Sub "https://${McpProtectedApi}.execute-api.${AWS::Region}.amazonaws.com/prod/mcp"
+  
+  McpAuthorizerFunction:
+    Description: MCP Authorizer Lambda Function
+    Value: !Ref McpAuthorizerFunction
+  
+  McpServerFunction:
+    Description: MCP Server Lambda Function
+    Value: !Ref McpServerFunction

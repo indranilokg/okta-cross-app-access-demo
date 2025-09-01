@@ -8,19 +8,23 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "build:lambda": "tsc && cp package.json dist/ && cd dist && npm install --production"
   },
   "keywords": [
     "mcp",
     "model-context-protocol",
     "atko",
     "documents",
-    "ai"
+    "ai",
+    "lambda",
+    "aws"
   ],
   "author": "Atko Corporation",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.4.0",
+    "atko-cross-app-access-sdk": "^1.0.0-beta.1",
     "axios": "^1.6.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
@@ -29,6 +33,7 @@
     "morgan": "^1.10.1"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.152",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/morgan": "^1.9.10",
