@@ -92,32 +92,23 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     }
 
     if (path === '/mcp/tools/call' && method === 'POST') {
-      // Verify authorization (Lambda Authorizer should handle this, but we'll double-check)
-      const authHeader = event.headers.Authorization || event.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      // Get user info from Lambda Authorizer context
+      const requestContext = event.requestContext;
+      const authorizer = requestContext.authorizer;
+      
+      if (!authorizer || !authorizer.userId || authorizer.verified !== 'true') {
         return {
           statusCode: 401,
           headers,
           body: JSON.stringify({
             error: 'access_denied',
-            error_description: 'Missing or invalid authorization header'
+            error_description: 'User not authorized by Lambda Authorizer'
           })
         };
       }
 
-      const token = authHeader.substring(7);
-      const { valid, sub } = await verifyAccessToken(token);
-      
-      if (!valid) {
-        return {
-          statusCode: 401,
-          headers,
-          body: JSON.stringify({
-            error: 'access_denied',
-            error_description: 'Invalid or expired access token'
-          })
-        };
-      }
+      const userId = authorizer.userId;
+      console.log(`✅ User authorized by Lambda Authorizer: ${userId}`);
 
       // Parse request body
       const body = JSON.parse(event.body || '{}');

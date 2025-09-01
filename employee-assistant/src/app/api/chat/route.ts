@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { mcpClient } from '@/utils/mcpClient';
+import { getMCPClient } from '@/utils/mcpClient';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
@@ -33,6 +33,7 @@ export async function POST(req: Request) {
   // Get MCP access token using Okta ID token
   let idJagToken: string | null = null;
   try {
+    const mcpClient = getMCPClient();
     const tokenResult = await mcpClient.getAccessToken(session.idToken as string);
     idJagToken = tokenResult.idJagToken;
     console.log('🔐 MCP authentication successful for user:', session.user?.email);
@@ -55,6 +56,7 @@ export async function POST(req: Request) {
       console.log('🔍 Searching documents for query:', userQuery);
       
       // Search for relevant documents
+      const mcpClient = getMCPClient();
       const searchResult = await mcpClient.searchDocuments({
         query: extractSearchQuery(userQuery),
         limit: 3
@@ -221,6 +223,7 @@ async function handleDocumentCreation(userMessage: string, assistantResponse: st
       // Extract title from user message
       const title = extractDocumentTitle(userMessage, assistantResponse);
       
+      const mcpClient = getMCPClient();
       await mcpClient.createDocument({
         title,
         content: `User Request: ${userMessage}\n\nAssistant Response: ${assistantResponse}`,

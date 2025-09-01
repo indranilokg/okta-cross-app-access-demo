@@ -1,9 +1,15 @@
 import { APIGatewayTokenAuthorizerEvent, APIGatewayAuthorizerResult } from 'aws-lambda';
 import { verifyIdJagToken } from 'atko-cross-app-access-sdk';
+import { SignJWT } from 'jose';
+import { v4 as uuidv4 } from 'uuid';
 
 // Okta configuration
 const OKTA_ISSUER = process.env.OKTA_ISSUER || 'https://your-domain.okta.com';
 const ID_JAG_AUDIENCE = process.env.ID_JAG_AUDIENCE || 'http://localhost:5001';
+const JWT_SECRET = process.env.JWT_SECRET || 'atko-mcp-auth-secret-key-change-in-production';
+
+// JWT signing key
+const JWT_SECRET_BYTES = new TextEncoder().encode(JWT_SECRET);
 
 // Lambda Authorizer for API Gateway
 export const authorizer = async (event: APIGatewayTokenAuthorizerEvent): Promise<APIGatewayAuthorizerResult> => {
@@ -15,12 +21,12 @@ export const authorizer = async (event: APIGatewayTokenAuthorizerEvent): Promise
       return generateDenyPolicy('anonymous', event.methodArn);
     }
 
-    const accessToken = token.substring(7); // Remove 'Bearer ' prefix
+    const idJagToken = token.substring(7); // Remove 'Bearer ' prefix
     
     console.log('🔍 Verifying ID-JAG token in Lambda Authorizer...');
 
     // Verify ID-JAG token using SDK
-    const verificationResult = await verifyIdJagToken(accessToken, {
+    const verificationResult = await verifyIdJagToken(idJagToken, {
       issuer: OKTA_ISSUER,
       audience: ID_JAG_AUDIENCE
     });
@@ -35,8 +41,12 @@ export const authorizer = async (event: APIGatewayTokenAuthorizerEvent): Promise
     console.log(`  • Email: ${verificationResult.email}`);
     console.log(`  • Audience: ${verificationResult.aud}`);
 
-    // Generate allow policy for the verified user
-    return generateAllowPolicy(verificationResult.sub, event.methodArn);
+    // Generate MCP access token (same logic as Vercel version)
+    console.log('🔐 Generating MCP access token for verified user...');
+    const mcpAccessToken = await generateMCPAccessToken(verificationResult.sub);
+
+    // Generate allow policy with MCP token in context
+    return generateAllowPolicy(verificationResult.sub, event.methodArn, mcpAccessToken);
 
   } catch (error) {
     console.error('❌ Lambda Authorizer error:', error);
@@ -44,8 +54,39 @@ export const authorizer = async (event: APIGatewayTokenAuthorizerEvent): Promise
   }
 };
 
+// Generate MCP access token (same logic as Vercel version)
+async function generateMCPAccessToken(sub: string): Promise<string> {
+  const tokenId = uuidv4();
+  const now = Math.floor(Date.now() / 1000);
+
+  const token = await new SignJWT({
+    sub,
+    aud: 'atko-mcp-document-server',
+    iss: 'atko-mcp-auth-server',
+    jti: tokenId,
+    scope: 'documents:read documents:write'
+  })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt(now)
+    .setExpirationTime(now + 3600) // 1 hour
+    .sign(JWT_SECRET_BYTES);
+
+  console.log(`✅ MCP access token generated for user: ${sub}`);
+  return token;
+}
+
 // Generate allow policy
-function generateAllowPolicy(principalId: string, resource: string): APIGatewayAuthorizerResult {
+function generateAllowPolicy(principalId: string, resource: string, mcpAccessToken?: string): APIGatewayAuthorizerResult {
+  const context: any = {
+    userId: principalId,
+    verified: 'true'
+  };
+
+  // Add MCP access token to context if provided
+  if (mcpAccessToken) {
+    context.mcpAccessToken = mcpAccessToken;
+  }
+
   return {
     principalId,
     policyDocument: {
@@ -58,10 +99,7 @@ function generateAllowPolicy(principalId: string, resource: string): APIGatewayA
         }
       ]
     },
-    context: {
-      userId: principalId,
-      verified: 'true'
-    }
+    context
   };
 }
 
