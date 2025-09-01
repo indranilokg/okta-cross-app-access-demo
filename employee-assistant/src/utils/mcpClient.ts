@@ -26,7 +26,7 @@ export interface DocumentCreateParams {
 
 export type DeploymentMode = 'vercel' | 'lambda';
 
-export class MCPClient {
+class MCPClient {
   private baseUrl: string;
   private authServerUrl: string;
   private accessToken: string | null = null;
@@ -328,4 +328,24 @@ export class MCPClient {
   }
 }
 
-export const mcpClient = new MCPClient(); 
+// Export the class for dynamic instantiation
+export { MCPClient };
+
+// Create a lazy singleton instance
+let mcpClientInstance: MCPClient | null = null;
+
+export const getMCPClient = (): MCPClient => {
+  if (!mcpClientInstance) {
+    try {
+      mcpClientInstance = new MCPClient();
+    } catch (error) {
+      console.error('Failed to initialize MCP client:', error);
+      // Return a fallback instance with default values
+      mcpClientInstance = new MCPClient();
+    }
+  }
+  return mcpClientInstance;
+};
+
+// For backward compatibility
+export const mcpClient = getMCPClient(); 

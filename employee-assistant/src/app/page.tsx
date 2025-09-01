@@ -23,7 +23,12 @@ export default function EmployeeAssistant() {
 
   // Update token information when component mounts
   useEffect(() => {
-    updateTokenInfo();
+    // Delay the token info update to ensure the component is fully mounted
+    const timer = setTimeout(() => {
+      updateTokenInfo();
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   // Show loading while checking authentication
@@ -68,11 +73,28 @@ export default function EmployeeAssistant() {
 
   // Update token information from MCP client
   const updateTokenInfo = async () => {
-    if (typeof window !== 'undefined') {
-      // Import mcpClient dynamically to avoid SSR issues
-      import('@/utils/mcpClient').then(async ({ mcpClient }) => {
+    try {
+      if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'test') {
+        // Import mcpClient dynamically to avoid SSR issues
+        const { getMCPClient } = await import('@/utils/mcpClient');
+        const mcpClient = getMCPClient();
         const info = await mcpClient.getTokenInfo();
         setTokenInfo(info);
+      } else {
+        // Set default token info for SSR or test environments
+        setTokenInfo({
+          hasValidToken: false,
+          idJagToken: null,
+          deploymentMode: 'vercel'
+        });
+      }
+    } catch (error) {
+      console.error('Failed to update token info:', error);
+      // Set default token info on error
+      setTokenInfo({
+        hasValidToken: false,
+        idJagToken: null,
+        deploymentMode: 'vercel'
       });
     }
   };
