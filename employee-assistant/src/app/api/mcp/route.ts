@@ -32,41 +32,4 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET endpoint to list available tools and check connection
-export async function GET() {
-  try {
-    // Check connection first
-    const isConnected = await mcpClient.checkConnection();
-    
-    if (!isConnected) {
-      return NextResponse.json(
-        { 
-          error: 'MCP server not available',
-          connected: false,
-          message: `Make sure the MCP server is running at ${process.env.MCP_SERVER_URL || 'http://localhost:3002'}`
-        },
-        { status: 503 }
-      );
-    }
-
-    // Get available tools
-    const tools = await mcpClient.getAvailableTools();
-    
-    return NextResponse.json({
-      connected: true,
-      server: process.env.MCP_SERVER_URL || 'http://localhost:3002',
-      ...tools
-    });
-
-  } catch (error) {
-    console.error('❌ MCP connection check failed:', error);
-    return NextResponse.json(
-      { 
-        error: 'Failed to connect to MCP server',
-        connected: false,
-        message: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
-  }
-} 
+ 

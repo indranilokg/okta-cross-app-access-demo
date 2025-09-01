@@ -18,31 +18,12 @@ export default function EmployeeAssistant() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const [mcpStatus, setMcpStatus] = useState<'connected' | 'disconnected' | 'loading'>('loading');
   const [lastIdJagToken, setLastIdJagToken] = useState<string | null>(null);
+  const [tokenInfo, setTokenInfo] = useState<any>(null);
 
-  // Check MCP server status
+  // Update token information when component mounts
   useEffect(() => {
-    const checkMcpStatus = async () => {
-      try {
-        const response = await fetch('/api/mcp');
-        if (response.ok) {
-          const data = await response.json();
-          setMcpStatus(data.connected ? 'connected' : 'disconnected');
-        } else {
-          setMcpStatus('disconnected');
-        }
-      } catch (error) {
-        console.error('MCP status check failed:', error);
-        setMcpStatus('disconnected');
-      }
-    };
-
-    // Check immediately and then every 30 seconds
-    checkMcpStatus();
-    const interval = setInterval(checkMcpStatus, 30000);
-
-    return () => clearInterval(interval);
+    updateTokenInfo();
   }, []);
 
   // Show loading while checking authentication
@@ -85,6 +66,17 @@ export default function EmployeeAssistant() {
     );
   }
 
+  // Update token information from MCP client
+  const updateTokenInfo = async () => {
+    if (typeof window !== 'undefined') {
+      // Import mcpClient dynamically to avoid SSR issues
+      import('@/utils/mcpClient').then(async ({ mcpClient }) => {
+        const info = await mcpClient.getTokenInfo();
+        setTokenInfo(info);
+      });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -118,6 +110,9 @@ export default function EmployeeAssistant() {
       if (data.idJagToken) {
         setLastIdJagToken(data.idJagToken);
       }
+      
+      // Update token information after successful API call
+      updateTokenInfo();
       
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -204,15 +199,26 @@ export default function EmployeeAssistant() {
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 <span className="text-sm text-gray-500">Online</span>
               </div>
-              <div className="flex items-center space-x-2 text-sm">
-                <div className={`w-2 h-2 rounded-full ${
-                  mcpStatus === 'connected' ? 'bg-green-500' : 
-                  mcpStatus === 'disconnected' ? 'bg-red-500' : 'bg-yellow-500 animate-pulse'
-                }`} />
-                <span className="text-gray-600">
-                  Documents: {mcpStatus === 'connected' ? 'Connected' : mcpStatus === 'disconnected' ? 'Disconnected' : 'Connecting...'}
-                </span>
-              </div>
+
+              {/* Token Information Display */}
+              {tokenInfo && (
+                <div className="flex items-center space-x-2 text-xs">
+                  <div className={`w-2 h-2 rounded-full ${
+                    tokenInfo.hasValidToken ? 'bg-green-500' : 'bg-red-500'
+                  }`} />
+                  <span className="text-gray-600">
+                    {tokenInfo.deploymentMode === 'lambda' ? 'Lambda' : 'Vercel'} Mode
+                  </span>
+                  <button
+                    onClick={updateTokenInfo}
+                    className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors"
+                    title="Refresh token info"
+                  >
+                    🔄
+                  </button>
+                </div>
+              )}
+
               {session?.user && (
                 <div className="flex items-center space-x-3">
                   <div className="text-right">

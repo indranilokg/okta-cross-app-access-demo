@@ -30,6 +30,7 @@ export class MCPClient {
   private baseUrl: string;
   private authServerUrl: string;
   private accessToken: string | null = null;
+  private idJagToken: string | null = null;
   private oktaBaseUrl: string;
   private audience: string;
   private clientId: string;
@@ -69,11 +70,44 @@ export class MCPClient {
     }
   }
 
-  // Get access token based on deployment mode
+  // Check if ID-JAG token is expired using SDK verification
+  private async isIdJagTokenExpired(): Promise<boolean> {
+    if (!this.idJagToken) {
+      return true;
+    }
+    
+    try {
+      // Use SDK to verify ID-JAG token (this will check expiration automatically)
+      const verificationResult = await verifyIdJagToken(this.idJagToken, {
+        issuer: this.oktaBaseUrl,
+        audience: this.audience
+      });
+      
+      return !verificationResult.valid;
+    } catch (error) {
+      console.log('ID-JAG token verification failed, considering expired:', error);
+      return true;
+    }
+  }
+
+  // Get access token based on deployment mode (with automatic refresh)
   async getAccessToken(idToken: string): Promise<{ accessToken: string; idJagToken: string }> {
+    // Check if we need to refresh tokens
     if (this.deploymentMode === 'lambda') {
-      return this.getAccessTokenLambda(idToken);
+      if (await this.isIdJagTokenExpired()) {
+        console.log('🔄 ID-JAG token expired, generating new one...');
+        return this.getAccessTokenLambda(idToken);
+      } else {
+        console.log('✅ Using existing valid ID-JAG token');
+        return {
+          accessToken: this.idJagToken!,
+          idJagToken: this.idJagToken!
+        };
+      }
     } else {
+      // For Vercel mode, always generate new MCP token from ID-JAG token
+      // Let the MCP server handle MCP token validation
+      console.log('🔄 Generating new MCP access token from ID-JAG token...');
       return this.getAccessTokenVercel(idToken);
     }
   }
@@ -116,6 +150,8 @@ export class MCPClient {
       // In Lambda mode, we use the ID-JAG token directly
       // The Lambda Authorizer will handle token verification
       this.accessToken = idJagResponse.access_token;
+      this.idJagToken = idJagResponse.access_token;
+      
       console.log('🎯 Lambda mode: Using ID-JAG token directly for API calls');
       
       return {
@@ -183,6 +219,8 @@ export class MCPClient {
 
       const tokenData = await response.json();
       this.accessToken = tokenData.access_token;
+      this.idJagToken = idJagResponse.access_token;
+      
       console.log('✅ MCP access token obtained from auth server');
       console.log(`🎯 Token type processed: ${tokenData.token_type_processed}`);
       console.log('🎯 Ready to make authenticated MCP calls');
@@ -239,16 +277,6 @@ export class MCPClient {
     return this.callTool('create_document', params);
   }
 
-  async checkConnection(): Promise<boolean> {
-    try {
-      const response = await fetch(`${this.baseUrl}/health`);
-      return response.ok;
-    } catch (error) {
-      console.error('MCP connection check failed:', error);
-      return false;
-    }
-  }
-
   async getAvailableTools(): Promise<any> {
     try {
       const response = await fetch(`${this.baseUrl}/tools`);
@@ -273,6 +301,30 @@ export class MCPClient {
       baseUrl: this.baseUrl,
       authServerUrl: this.authServerUrl
     };
+  }
+
+  // Get current token information for UI display
+  async getTokenInfo(): Promise<{
+    hasValidToken: boolean;
+    idJagToken: string | null;
+    deploymentMode: DeploymentMode;
+  }> {
+    // Only check ID-JAG token validity - MCP server handles MCP token validation
+    const isExpired = await this.isIdJagTokenExpired();
+    
+    return {
+      hasValidToken: !isExpired,
+      idJagToken: this.idJagToken,
+      deploymentMode: this.deploymentMode
+    };
+  }
+
+  // Force refresh tokens (useful for manual refresh)
+  async refreshTokens(idToken: string): Promise<{ accessToken: string; idJagToken: string }> {
+    console.log('🔄 Forcing token refresh...');
+    this.accessToken = null;
+    this.idJagToken = null;
+    return this.getAccessToken(idToken);
   }
 }
 
