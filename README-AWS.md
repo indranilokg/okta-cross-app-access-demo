@@ -24,9 +24,9 @@ A comprehensive guide for deploying the Atko MCP services to AWS Lambda using AW
 
 - **Employee Assistant**: Next.js app (can be deployed anywhere)
 - **Document Database**: REST API (deployed separately)
-- **MCP Server**: Lambda function with API Gateway
+- **MCP Server**: Lambda function with consolidated API Gateway
 - **MCP Auth**: Lambda authorizer for token validation
-- **API Gateway**: HTTP routing and CORS management
+- **API Gateway**: Single gateway with authorizer for all endpoints
 
 ## 🔧 Prerequisites
 
@@ -92,7 +92,7 @@ ID_JAG_CLIENT_SECRET=your-id-jag-client-secret
 MCP_DEPLOYMENT_MODE=lambda
 
 # Lambda Deployment
-MCP_LAMBDA_URL=https://your-api-gateway.amazonaws.com/mcp
+MCP_LAMBDA_URL=https://r4eosz6dm6.execute-api.us-east-1.amazonaws.com/prod/mcp
 ```
 
 ### **4. Set AWS Environment Variables**
@@ -143,12 +143,12 @@ sam local invoke McpAuthorizerFunction --event events/authorizer-event.json
 
 ### **Production Testing**
 ```bash
-# Test health endpoints
-curl https://your-api-gateway.amazonaws.com/mcp/health
-
-# Test with authentication
+# Test all endpoints (all require authentication)
 curl -H "Authorization: Bearer YOUR_ID_JAG_TOKEN" \
-  https://your-api-gateway.amazonaws.com/mcp/tools/call \
+  https://r4eosz6dm6.execute-api.us-east-1.amazonaws.com/prod/mcp/health
+
+curl -H "Authorization: Bearer YOUR_ID_JAG_TOKEN" \
+  https://r4eosz6dm6.execute-api.us-east-1.amazonaws.com/prod/mcp/tools/call \
   -d '{"tool":"search_documents","arguments":{"query":"test"}}'
 ```
 

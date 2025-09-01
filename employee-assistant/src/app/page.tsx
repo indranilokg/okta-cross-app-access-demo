@@ -21,6 +21,34 @@ export default function EmployeeAssistant() {
   const [lastIdJagToken, setLastIdJagToken] = useState<string | null>(null);
   const [tokenInfo, setTokenInfo] = useState<any>(null);
 
+  // Update token information from MCP client
+  const updateTokenInfo = async () => {
+    try {
+      if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'test') {
+        // Import mcpClient dynamically to avoid SSR issues
+        const { getMCPClient } = await import('@/utils/mcpClient');
+        const mcpClient = getMCPClient();
+        const info = await mcpClient.getTokenInfo();
+        setTokenInfo(info);
+      } else {
+        // Set default token info for SSR or test environments
+        setTokenInfo({
+          hasValidToken: false,
+          idJagToken: null,
+          deploymentMode: (process.env.NEXT_PUBLIC_MCP_DEPLOYMENT_MODE as 'vercel' | 'lambda') || 'vercel'
+        });
+      }
+    } catch (error) {
+      console.error('Failed to update token info:', error);
+      // Set default token info on error
+      setTokenInfo({
+        hasValidToken: false,
+        idJagToken: null,
+        deploymentMode: (process.env.NEXT_PUBLIC_MCP_DEPLOYMENT_MODE as 'vercel' | 'lambda') || 'vercel'
+      });
+    }
+  };
+
   // Update token information when component mounts
   useEffect(() => {
     // Delay the token info update to ensure the component is fully mounted
@@ -70,34 +98,6 @@ export default function EmployeeAssistant() {
       </div>
     );
   }
-
-  // Update token information from MCP client
-  const updateTokenInfo = async () => {
-    try {
-      if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'test') {
-        // Import mcpClient dynamically to avoid SSR issues
-        const { getMCPClient } = await import('@/utils/mcpClient');
-        const mcpClient = getMCPClient();
-        const info = await mcpClient.getTokenInfo();
-        setTokenInfo(info);
-      } else {
-        // Set default token info for SSR or test environments
-        setTokenInfo({
-          hasValidToken: false,
-          idJagToken: null,
-          deploymentMode: 'vercel'
-        });
-      }
-    } catch (error) {
-      console.error('Failed to update token info:', error);
-      // Set default token info on error
-      setTokenInfo({
-        hasValidToken: false,
-        idJagToken: null,
-        deploymentMode: 'vercel'
-      });
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -45,8 +45,8 @@ class MCPClient {
     clientId: string = process.env.ID_JAG_CLIENT_ID || 'YOUR_CLIENT_ID',
     clientSecret: string = process.env.ID_JAG_CLIENT_SECRET || 'YOUR_CLIENT_SECRET'
   ) {
-    // Detect deployment mode from environment
-    this.deploymentMode = (process.env.MCP_DEPLOYMENT_MODE as DeploymentMode) || 'vercel';
+    // Detect deployment mode from environment (use public env var for client-side)
+    this.deploymentMode = (process.env.NEXT_PUBLIC_MCP_DEPLOYMENT_MODE as DeploymentMode) || 'vercel';
     
     if (this.deploymentMode === 'lambda') {
       // Lambda deployment - direct API Gateway URL (no separate auth server needed)

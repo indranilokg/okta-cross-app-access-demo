@@ -1,0 +1,8 @@
+# Cleanup template to remove McpPublicApi resource
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Cleanup template to remove McpPublicApi
+
+Resources:
+  # This template intentionally has no resources to remove McpPublicApi
+  # The existing resources will remain unchanged

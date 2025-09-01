@@ -69,21 +69,24 @@ Update your Employee Assistant environment variables:
 MCP_DEPLOYMENT_MODE=lambda
 
 # Set Lambda URL (replace with your actual URL)
-MCP_LAMBDA_URL=https://your-api-gateway.amazonaws.com/mcp
+MCP_LAMBDA_URL=https://r4eosz6dm6.execute-api.us-east-1.amazonaws.com/prod/mcp
 ```
 
 ## 🧪 Testing Deployment
 
 ### **Health Checks**
 ```bash
-# Test MCP server health (Public API - No Auth Required)
-curl https://eiyux0le5i.execute-api.us-east-1.amazonaws.com/prod/mcp/health
+# Test MCP server health (Protected API - Auth Required)
+curl -H "Authorization: Bearer YOUR_ID_JAG_TOKEN" \
+  https://r4eosz6dm6.execute-api.us-east-1.amazonaws.com/prod/mcp/health
 
-# Test MCP server info (Public API - No Auth Required)
-curl https://eiyux0le5i.execute-api.us-east-1.amazonaws.com/prod/mcp/info
+# Test MCP server info (Protected API - Auth Required)
+curl -H "Authorization: Bearer YOUR_ID_JAG_TOKEN" \
+  https://r4eosz6dm6.execute-api.us-east-1.amazonaws.com/prod/mcp/info
 
-# Test MCP tools list (Public API - No Auth Required)
-curl https://eiyux0le5i.execute-api.us-east-1.amazonaws.com/prod/mcp/tools
+# Test MCP tools list (Protected API - Auth Required)
+curl -H "Authorization: Bearer YOUR_ID_JAG_TOKEN" \
+  https://r4eosz6dm6.execute-api.us-east-1.amazonaws.com/prod/mcp/tools
 ```
 
 ### **Authentication Test**
@@ -96,17 +99,12 @@ curl -H "Authorization: Bearer YOUR_ID_JAG_TOKEN" \
 
 ### **API Architecture**
 
-Your deployment creates two separate API Gateways for optimal security:
-
-- **🔓 Public API**: `https://eiyux0le5i.execute-api.us-east-1.amazonaws.com/prod/mcp`
-  - No authentication required
-  - Endpoints: `/health`, `/info`, `/tools`
-  - Used for health checks and service discovery
+Your deployment uses a single consolidated API Gateway for optimal security:
 
 - **🔐 Protected API**: `https://r4eosz6dm6.execute-api.us-east-1.amazonaws.com/prod/mcp`
-  - ID-JAG token authentication required
-  - Endpoints: `/tools/call`, all other MCP endpoints
-  - Used for actual MCP tool operations
+  - ID-JAG token authentication required for ALL endpoints
+  - Endpoints: `/health`, `/info`, `/tools`, `/tools/call`, all other MCP endpoints
+  - Used for all MCP operations with consistent security
 
 ## 🔍 Monitoring
 

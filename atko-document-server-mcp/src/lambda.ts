@@ -1,6 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { DocumentClient } from './utils/documentClient.js';
-import { verifyAccessToken } from './utils/tokenVerifier.js';
 
 // Create document client
 const documentClient = new DocumentClient(
@@ -10,6 +9,10 @@ const documentClient = new DocumentClient(
 // Lambda handler for API Gateway
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   try {
+    console.log('🚀 Lambda handler started');
+    console.log('📡 Request path:', event.path);
+    console.log('🔧 Request method:', event.httpMethod);
+    
     const path = event.path;
     const method = event.httpMethod;
     const headers = {
@@ -147,6 +150,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
   } catch (error) {
     console.error('❌ Lambda handler error:', error);
+    console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     return {
       statusCode: 500,
       headers: {
@@ -155,7 +159,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       },
       body: JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : 'No stack trace'
       })
     };
   }
@@ -164,10 +169,12 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 // Tool: search_documents
 async function handleSearchDocuments(args: any, headers: any): Promise<APIGatewayProxyResult> {
   try {
+    console.log('🔍 Starting document search with args:', args);
     const { query, category, author, tags, limit = 10 } = args;
 
     // Validate required parameters
     if (!query && !category && !author && !tags) {
+      console.log('❌ Missing search parameters');
       return {
         statusCode: 400,
         headers,
@@ -180,6 +187,7 @@ async function handleSearchDocuments(args: any, headers: any): Promise<APIGatewa
 
     // Check if document database is configured
     if (!process.env.DOCUMENT_DATABASE_URL) {
+      console.log('❌ Document database URL not configured');
       return {
         statusCode: 503,
         headers,
@@ -190,6 +198,8 @@ async function handleSearchDocuments(args: any, headers: any): Promise<APIGatewa
       };
     }
 
+    console.log('📡 Document database URL:', process.env.DOCUMENT_DATABASE_URL);
+
     const searchParams = {
       q: query,
       category,
@@ -198,7 +208,12 @@ async function handleSearchDocuments(args: any, headers: any): Promise<APIGatewa
       limit: Math.min(limit, 50) // Cap at 50 results
     };
 
+    console.log('🔍 Search parameters:', searchParams);
+    console.log('📡 Calling documentClient.searchDocuments...');
+
     const documents = await documentClient.searchDocuments(searchParams);
+    
+    console.log(`✅ Document search completed successfully. Found ${documents.length} documents`);
 
     return {
       statusCode: 200,
