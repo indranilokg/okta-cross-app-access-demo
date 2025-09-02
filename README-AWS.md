@@ -381,7 +381,7 @@ aws ce get-cost-and-usage \
 
 ## 📚 Resources
 
-- [Okta ID-JAG Documentation](https://developer.okta.com/docs/guides/identity-assertion-jwt-access-grant/)
+- [Okta Cross App Access](https://help.okta.com/oie/en-us/content/topics/apps/apps-cross-app-access.htm)
 - [MCP Specification](https://modelcontextprotocol.io/)
 - [AWS Lambda Documentation](https://docs.aws.amazon.com/lambda/)
 - [AWS SAM Documentation](https://docs.aws.amazon.com/serverless-application-model/)
