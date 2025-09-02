@@ -144,6 +144,11 @@ build/
 dist/
 out/
 
+# Test files
+test-*.js
+test-*.json
+test-*.ts
+
 # Package manager files
 package-lock.json
 yarn.lock

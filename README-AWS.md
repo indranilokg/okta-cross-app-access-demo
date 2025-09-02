@@ -92,7 +92,7 @@ ID_JAG_CLIENT_SECRET=your-id-jag-client-secret
 MCP_DEPLOYMENT_MODE=lambda
 
 # Lambda Deployment
-MCP_LAMBDA_URL=https://r4eosz6dm6.execute-api.us-east-1.amazonaws.com/prod/mcp
+MCP_LAMBDA_URL=https://your-api-gateway.amazonaws.com/prod/mcp
 ```
 
 ### **4. Set AWS Environment Variables**
@@ -145,10 +145,10 @@ sam local invoke McpAuthorizerFunction --event events/authorizer-event.json
 ```bash
 # Test all endpoints (all require authentication)
 curl -H "Authorization: Bearer YOUR_ID_JAG_TOKEN" \
-  https://r4eosz6dm6.execute-api.us-east-1.amazonaws.com/prod/mcp/health
+  https://your-api-gateway.amazonaws.com/prod/mcp/health
 
 curl -H "Authorization: Bearer YOUR_ID_JAG_TOKEN" \
-  https://r4eosz6dm6.execute-api.us-east-1.amazonaws.com/prod/mcp/tools/call \
+  https://your-api-gateway.amazonaws.com/prod/mcp/tools/call \
   -d '{"tool":"search_documents","arguments":{"query":"test"}}'
 ```
 

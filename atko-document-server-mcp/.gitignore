@@ -9,6 +9,10 @@ dist/
 build/
 out/
 
+# AWS SAM build artifacts
+.aws-sam/
+samconfig.toml
+
 # Environment variables
 .env
 .env.local

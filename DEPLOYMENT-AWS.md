@@ -69,7 +69,7 @@ Update your Employee Assistant environment variables:
 MCP_DEPLOYMENT_MODE=lambda
 
 # Set Lambda URL (replace with your actual URL)
-MCP_LAMBDA_URL=https://r4eosz6dm6.execute-api.us-east-1.amazonaws.com/prod/mcp
+MCP_LAMBDA_URL=https://your-api-gateway.amazonaws.com/prod/mcp
 ```
 
 ## 🧪 Testing Deployment
@@ -78,22 +78,22 @@ MCP_LAMBDA_URL=https://r4eosz6dm6.execute-api.us-east-1.amazonaws.com/prod/mcp
 ```bash
 # Test MCP server health (Protected API - Auth Required)
 curl -H "Authorization: Bearer YOUR_ID_JAG_TOKEN" \
-  https://r4eosz6dm6.execute-api.us-east-1.amazonaws.com/prod/mcp/health
+  https://your-api-gateway.amazonaws.com/prod/mcp/health
 
 # Test MCP server info (Protected API - Auth Required)
 curl -H "Authorization: Bearer YOUR_ID_JAG_TOKEN" \
-  https://r4eosz6dm6.execute-api.us-east-1.amazonaws.com/prod/mcp/info
+  https://your-api-gateway.amazonaws.com/prod/mcp/info
 
 # Test MCP tools list (Protected API - Auth Required)
 curl -H "Authorization: Bearer YOUR_ID_JAG_TOKEN" \
-  https://r4eosz6dm6.execute-api.us-east-1.amazonaws.com/prod/mcp/tools
+  https://your-api-gateway.amazonaws.com/prod/mcp/tools
 ```
 
 ### **Authentication Test**
 ```bash
 # Test MCP tool call (Protected API - Auth Required)
 curl -H "Authorization: Bearer YOUR_ID_JAG_TOKEN" \
-  https://r4eosz6dm6.execute-api.us-east-1.amazonaws.com/prod/mcp/tools/call \
+  https://your-api-gateway.amazonaws.com/prod/mcp/tools/call \
   -d '{"tool":"search_documents","arguments":{"query":"test"}}'
 ```
 
@@ -101,7 +101,7 @@ curl -H "Authorization: Bearer YOUR_ID_JAG_TOKEN" \
 
 Your deployment uses a single consolidated API Gateway for optimal security:
 
-- **🔐 Protected API**: `https://r4eosz6dm6.execute-api.us-east-1.amazonaws.com/prod/mcp`
+- **🔐 Protected API**: `https://your-api-gateway.amazonaws.com/prod/mcp`
   - ID-JAG token authentication required for ALL endpoints
   - Endpoints: `/health`, `/info`, `/tools`, `/tools/call`, all other MCP endpoints
   - Used for all MCP operations with consistent security
@@ -111,13 +111,13 @@ Your deployment uses a single consolidated API Gateway for optimal security:
 ### **CloudWatch Logs**
 ```bash
 # List Lambda log groups
-aws logs describe-log-groups --log-group-name-prefix '/aws/lambda/atko-mcp'
+aws logs describe-log-groups --log-group-name-prefix '/aws/lambda/atko-document-server-mcp'
 
 # View MCP server logs
-aws logs tail /aws/lambda/atko-mcp-document-server-prod-mcpServer --follow
+aws logs tail /aws/lambda/atko-document-server-mcp-McpServerFunction-* --follow
 
 # View authorizer logs
-aws logs tail /aws/lambda/atko-mcp-auth-server-prod-mcpAuthorizer --follow
+aws logs tail /aws/lambda/atko-document-server-mcp-aut-McpAuthorizerFunction-* --follow
 ```
 
 ### **CloudWatch Metrics**
@@ -154,10 +154,10 @@ aws logs tail /aws/lambda/atko-mcp-auth-server-prod-mcpAuthorizer --follow
 #### **Deployment Failures**
 ```bash
 # Check CloudFormation stack status
-aws cloudformation describe-stacks --stack-name atko-mcp-document-server
+aws cloudformation describe-stacks --stack-name atko-document-server-mcp
 
 # View deployment events
-aws cloudformation describe-stack-events --stack-name atko-mcp-document-server
+aws cloudformation describe-stack-events --stack-name atko-document-server-mcp
 ```
 
 #### **Permission Errors**
@@ -172,11 +172,11 @@ aws cloudformation list-stacks
 #### **Function Errors**
 ```bash
 # Test Lambda function directly
-aws lambda invoke --function-name atko-mcp-document-server-prod-mcpServer \
+aws lambda invoke --function-name atko-document-server-mcp-McpServerFunction-* \
   --payload '{"path":"/mcp/health","httpMethod":"GET"}' response.json
 
 # View function configuration
-aws lambda get-function --function-name atko-mcp-document-server-prod-mcpServer
+aws lambda get-function --function-name atko-document-server-mcp-McpServerFunction-*
 ```
 
 #### **API Gateway Issues**
@@ -194,7 +194,7 @@ curl -v https://your-api-gateway.amazonaws.com/mcp/health
 sam info
 
 # Check Lambda function status
-aws lambda list-functions --query 'Functions[?contains(FunctionName, `atko-mcp`)]'
+aws lambda list-functions --query 'Functions[?contains(FunctionName, `atko-document-server-mcp`)]'
 
 # View API Gateway APIs
 aws apigateway get-rest-apis
