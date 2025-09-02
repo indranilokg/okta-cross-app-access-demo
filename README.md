@@ -1,6 +1,6 @@
 # Atko Cross-App Access Demo
 
-A comprehensive demonstration of cross-application access using Okta's ID-JAG (Identity Assertion for JWT Access Grant) tokens with MCP (Model Context Protocol) integration. This project showcases secure document management across multiple applications with dual deployment support for both Vercel and AWS Lambda.
+A comprehensive demonstration of **cross-application access** using Okta's **[ID-JAG (Identity Assertion for JWT Access Grant)](https://datatracker.ietf.org/doc/draft-parecki-oauth-identity-assertion-authz-grant/)** tokens with **MCP (Model Context Protocol)** integration. This project showcases secure document management across multiple applications with **dual deployment support** for both Vercel and AWS Lambda.
 
 ## 🏗️ Architecture Overview
 
@@ -20,22 +20,38 @@ A comprehensive demonstration of cross-application access using Okta's ID-JAG (I
 └─────────────────┘                          └─────────────────┘
 ```
 
+## 🔐 Authentication Flow
+
+### **Vercel Mode**
+1. User authenticates with Okta
+2. Employee Assistant exchanges ID token for ID-JAG token
+3. ID-JAG token exchanged for MCP access token via auth server
+4. MCP calls made with access token
+
+### **Lambda Mode**
+1. User authenticates with Okta
+2. Employee Assistant exchanges ID token for ID-JAG token
+3. ID-JAG token used directly (Lambda authorizer validates)
+4. MCP calls made with ID-JAG token
+
 ## 🚀 Deployment Options
 
 ### **Dual Deployment Architecture**
 
 This project supports **both Vercel and AWS Lambda deployments** simultaneously:
 
-#### **Vercel Deployment (Existing)**
+#### **Vercel Deployment (Development/Staging)**
 - **MCP Server**: Express.js server on Vercel
 - **MCP Auth**: OAuth server on Vercel  
 - **MCP Proxy**: Next.js proxy for unified routing
 - **Employee Assistant**: Next.js app on Vercel
+- **Document Database**: Next.js REST API on Vercel
 
-#### **Lambda Deployment (AWS SAM)**
+#### **Lambda Deployment (Production)**
 - **MCP Server**: Lambda function with API Gateway
 - **MCP Auth**: Lambda authorizer for token validation
-- **Employee Assistant**: Next.js app (can connect to either deployment)
+- **Employee Assistant**: Next.js app (connects to Lambda)
+- **Document Database**: External REST API
 
 ## 📁 Project Structure
 
@@ -49,7 +65,26 @@ okta-cross-app-access-demo/
 └── README.md
 ```
 
-## 🔧 Quick Start
+## 🔧 Key Technologies
+
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Backend**: Express.js, Node.js, TypeScript
+- **Identity Provider**: **Okta** (Central authentication and authorization)
+- **Cross-App Access**: **[OAuth 2.1 ID-JAG](https://datatracker.ietf.org/doc/draft-parecki-oauth-identity-assertion-authz-grant/)** (Identity Assertion Authorization Grant)
+- **AI**: OpenAI API, Model Context Protocol (MCP)
+- **Deployment**: Vercel + AWS Lambda (dual deployment)
+- **Security**: JWT, Jose library, CORS, Lambda Authorizers
+
+## 🎯 Cross-App Access Use Cases
+
+1. **Employee Self-Service**: AI-powered assistance for company policies and procedures
+2. **Document Management**: Secure access to company documents via AI chat
+3. **Cross-App Authorization**: Secure token exchange between applications using Okta [ID-JAG](https://datatracker.ietf.org/doc/draft-parecki-oauth-identity-assertion-authz-grant/)
+4. **MCP Integration**: Standardized AI tool calling for document operations
+5. **Okta Identity Federation**: Centralized identity management across multiple applications
+6. **Secure Service-to-Service Communication**: Applications securely access each other's APIs
+
+## 🚀 Quick Start
 
 Choose your deployment platform:
 
@@ -64,20 +99,6 @@ For production and cost optimization, see [README-AWS.md](./README-AWS.md)
 - Okta Developer Account
 - OpenAI API Key
 - Vercel Account (for Vercel deployment) or AWS Account (for Lambda deployment)
-
-## 🔐 Authentication Flow
-
-### **Vercel Mode**
-1. User authenticates with Okta
-2. Employee Assistant exchanges ID token for ID-JAG token
-3. ID-JAG token exchanged for MCP access token via auth server
-4. MCP calls made with access token
-
-### **Lambda Mode**
-1. User authenticates with Okta
-2. Employee Assistant exchanges ID token for ID-JAG token
-3. ID-JAG token used directly (Lambda authorizer validates)
-4. MCP calls made with ID-JAG token
 
 ## 📡 API Endpoints
 
@@ -99,59 +120,10 @@ For production and cost optimization, see [README-AWS.md](./README-AWS.md)
 2. **Lambda Mode**: Add to `atko-document-server-mcp/src/lambda.ts`
 3. **Both**: Update tool definitions in both files
 
-### **Testing Both Deployments**
+## 📄 License
 
-```bash
-# Test Vercel deployment
-curl -H "Authorization: Bearer $TOKEN" \
-  http://localhost:3002/mcp/health
-
-# Test Lambda deployment
-curl -H "Authorization: Bearer $TOKEN" \
-  https://your-api-gateway.amazonaws.com/mcp/health
-```
-
-## 🚀 Deployment
-
-### **Vercel Deployment**
-For detailed Vercel deployment instructions, see [DEPLOYMENT-VERCEL.md](./DEPLOYMENT-VERCEL.md)
-
-### **AWS Lambda Deployment**
-For detailed AWS Lambda deployment instructions, see [DEPLOYMENT-AWS.md](./DEPLOYMENT-AWS.md)
-
-## 🔍 Monitoring
-
-### **Vercel**
-- Vercel Dashboard for logs and metrics
-- Built-in analytics and performance monitoring
-
-### **Lambda**
-- CloudWatch Logs for function execution
-- CloudWatch Metrics for performance monitoring
-- X-Ray for distributed tracing
-
-## 🔒 Security
-
-- **ID-JAG Tokens**: Secure cross-app identity assertion
-- **Lambda Authorizer**: Serverless token validation
-- **CORS**: Properly configured for both deployments
-- **Environment Variables**: Secure configuration management
-
-## 📚 Documentation
-
-- [Okta ID-JAG Documentation](https://developer.okta.com/docs/guides/identity-assertion-jwt-access-grant/)
-- [MCP Specification](https://modelcontextprotocol.io/)
-- [AWS Lambda Documentation](https://docs.aws.amazon.com/lambda/)
-- [Vercel Documentation](https://vercel.com/docs)
+MIT License - see individual service directories for details.
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test both Vercel and Lambda deployments
-5. Submit a pull request
-
-## 📄 License
-
-MIT License - see LICENSE file for details. 
+This is an internal Atko Corporation project demonstrating Okta **cross-app access patterns** using **OAuth 2.1 [ID-JAG](https://datatracker.ietf.org/doc/draft-parecki-oauth-identity-assertion-authz-grant/)** with Model Context Protocol (MCP) for secure inter-application communication. 

@@ -4,29 +4,184 @@ A comprehensive guide for deploying the Atko MCP services to AWS Lambda using AW
 
 ## 🏗️ AWS Lambda Architecture
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Employee      │    │   Internal      │    │   MCP Services  │
-│   Assistant     │◄──►│   Document      │◄──►│   (Lambda)      │
-│   (Next.js)     │    │   Database      │    │                 │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                                              │
-         │                                              │
-         ▼                                              ▼
-┌─────────────────┐                          ┌─────────────────┐
-│   Okta ID-JAG   │                          │   Lambda        │
-│   Token Flow    │                          │   Authorizer    │
-│                 │                          │                 │
-└─────────────────┘                          └─────────────────┘
+```mermaid
+graph TB
+    subgraph "Frontend Applications"
+        EA[Employee Assistant<br/>Next.js AI Chat]
+        DD[Document Database<br/>External REST API]
+    end
+
+    subgraph "MCP Services (Lambda)"
+        MCP_LAMBDA[MCP Document Server<br/>Lambda Function]
+        MCP_AUTH[MCP Auth Server<br/>Lambda Authorizer]
+    end
+
+    subgraph "AWS Infrastructure"
+        API_GW[API Gateway<br/>Consolidated Gateway]
+        LAMBDA[Lambda Functions<br/>Serverless Compute]
+        CLOUDWATCH[CloudWatch<br/>Logs & Metrics]
+    end
+
+    subgraph "External Services"
+        OKTA[Okta Identity Provider]
+        OPENAI[OpenAI API]
+    end
+
+    subgraph "SDK"
+        CAA_SDK[atko-cross-app-access-sdk<br/>ID-JAG Token Exchange]
+    end
+
+    EA -->|ID Token| CAA_SDK
+    CAA_SDK -->|ID-JAG Token| OKTA
+    EA -->|ID-JAG Token| API_GW
+    API_GW -->|Authorized Request| MCP_LAMBDA
+    MCP_LAMBDA -->|Document Operations| DD
+    EA -->|Chat Requests| OPENAI
+    MCP_AUTH -->|Token Verification| OKTA
+    API_GW -->|Auth Check| MCP_AUTH
+
+    style EA fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#000000
+    style DD fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#000000
+    style MCP_LAMBDA fill:#fff3e0,stroke:#ff9800,stroke-width:2px,color:#000000
+    style MCP_AUTH fill:#fff3e0,stroke:#ff9800,stroke-width:2px,color:#000000
+    style API_GW fill:#e8f5e8,stroke:#4caf50,stroke-width:2px,color:#000000
+    style LAMBDA fill:#e8f5e8,stroke:#4caf50,stroke-width:2px,color:#000000
+    style CLOUDWATCH fill:#e8f5e8,stroke:#4caf50,stroke-width:2px,color:#000000
+    style OKTA fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px,color:#000000
+    style OPENAI fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px,color:#000000
+    style CAA_SDK fill:#e8f5e8,stroke:#4caf50,stroke-width:2px,color:#000000
 ```
 
-## 📁 AWS Services
+## 🔐 Authentication Flow
 
-- **Employee Assistant**: Next.js app (can be deployed anywhere)
-- **Document Database**: REST API (deployed separately)
-- **MCP Server**: Lambda function with consolidated API Gateway
-- **MCP Auth**: Lambda authorizer for token validation
-- **API Gateway**: Single gateway with authorizer for all endpoints
+```mermaid
+sequenceDiagram
+    participant User
+    participant EA as Employee Assistant
+    participant SDK as CAA SDK
+    participant Okta
+    participant API_GW as API Gateway
+    participant AUTH as Lambda Authorizer
+    participant MCP as MCP Lambda
+    participant DD as Document Database
+
+    User->>EA: Login with Okta
+    EA->>Okta: Authenticate user
+    Okta-->>EA: Return ID Token
+    EA->>SDK: Exchange ID Token for ID-JAG
+    SDK->>Okta: Token Exchange Request
+    Okta-->>SDK: ID-JAG Token
+    SDK-->>EA: ID-JAG Token
+    EA->>API_GW: Request with ID-JAG Token
+    API_GW->>AUTH: Authorize Request
+    AUTH->>Okta: Verify ID-JAG Token
+    Okta-->>AUTH: Token Valid
+    AUTH-->>API_GW: Authorization Granted
+    API_GW->>MCP: Forward Request
+    MCP->>DD: Document Operations
+    DD-->>MCP: Document Data
+    MCP-->>API_GW: MCP Response
+    API_GW-->>EA: HTTP Response
+    EA-->>User: AI Response with Document Context
+```
+
+## 📦 Service Descriptions
+
+### 🎯 **Employee Assistant** (`employee-assistant/`)
+**Purpose**: AI-powered chat interface for employee assistance with document access
+- **Technology**: Next.js 15, React 19, NextAuth.js, OpenAI API
+- **Features**: 
+  - **Okta authentication** with **ID-JAG token exchange**
+  - AI chat with document context
+  - Document search and creation via MCP
+  - Real-time ID-JAG token display
+  - **Cross-app access** to document database
+  - **Lambda deployment mode** support
+- **Port**: 3000 (development)
+- **Deployment**: Any platform (connects to Lambda)
+
+### 📚 **Document Database** (`internal-document-database/`)
+**Purpose**: REST API for company document management
+- **Technology**: Next.js 15, TypeScript, JSON file storage
+- **Features**:
+  - CRUD operations for documents
+  - Category-based organization
+  - Search functionality
+  - Tag-based filtering
+- **Port**: 3001 (development)
+- **Deployment**: External (Vercel or other platform)
+
+### 🔐 **MCP Auth Server** (`atko-document-server-mcp-auth/`)
+**Purpose**: Lambda authorizer for MCP access token validation
+- **Technology**: AWS Lambda, TypeScript, Jose JWT
+- **Features**:
+  - **Okta ID-JAG token verification**
+  - MCP access token generation
+  - **Cross-app authorization enforcement**
+  - **Secure token validation** for API Gateway
+- **Runtime**: Node.js 18.x
+- **Deployment**: AWS Lambda (separate from main MCP server)
+
+### 🛠️ **MCP Document Server** (`atko-document-server-mcp/`)
+**Purpose**: MCP server for document operations
+- **Technology**: AWS Lambda, TypeScript, MCP SDK
+- **Features**:
+  - Document search via MCP tools
+  - Document creation via MCP tools
+  - JWT access token verification
+  - HTTP transport implementation via API Gateway
+- **Runtime**: Node.js 18.x
+- **Deployment**: AWS Lambda with API Gateway
+
+### ☁️ **AWS Infrastructure**
+**Purpose**: Serverless infrastructure for MCP services
+- **Technology**: AWS SAM, CloudFormation, API Gateway, Lambda
+- **Features**:
+  - **Consolidated API Gateway** with authorizer
+  - **Serverless Lambda functions** for scalability
+  - **CloudWatch monitoring** and logging
+  - **IAM role management** for security
+- **Deployment**: AWS CloudFormation via SAM
+
+## 🚀 Deployment Architecture
+
+```mermaid
+graph LR
+    subgraph "AWS Lambda Infrastructure"
+        API_GW[API Gateway<br/>Consolidated Gateway]
+        MCP_LAMBDA[MCP Document Server<br/>Lambda Function]
+        MCP_AUTH[MCP Auth Server<br/>Lambda Authorizer]
+        CLOUDWATCH[CloudWatch<br/>Logs & Metrics]
+    end
+
+    subgraph "External Applications"
+        EA[Employee Assistant<br/>Next.js App]
+        DD[Document Database<br/>External API]
+    end
+
+    subgraph "External Services"
+        OKTA[Okta Identity Provider]
+        OPENAI[OpenAI API]
+    end
+
+    EA -->|ID-JAG Token| API_GW
+    API_GW -->|Auth Check| MCP_AUTH
+    MCP_AUTH -->|Token Verification| OKTA
+    API_GW -->|Authorized Request| MCP_LAMBDA
+    MCP_LAMBDA -->|Document API| DD
+    EA -->|Chat API| OPENAI
+    MCP_LAMBDA -->|Logs| CLOUDWATCH
+    MCP_AUTH -->|Logs| CLOUDWATCH
+
+    style API_GW fill:#e8f5e8,stroke:#4caf50,stroke-width:2px,color:#000000
+    style MCP_LAMBDA fill:#fff3e0,stroke:#ff9800,stroke-width:2px,color:#000000
+    style MCP_AUTH fill:#fff3e0,stroke:#ff9800,stroke-width:2px,color:#000000
+    style CLOUDWATCH fill:#e8f5e8,stroke:#4caf50,stroke-width:2px,color:#000000
+    style EA fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#000000
+    style DD fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#000000
+    style OKTA fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px,color:#000000
+    style OPENAI fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px,color:#000000
+```
 
 ## 🔧 Prerequisites
 
@@ -109,26 +264,6 @@ export ID_JAG_AUDIENCE="https://your-domain.com"
 ./deploy-sam.sh
 ```
 
-## 🔐 Authentication Flow
-
-### **Lambda Mode**
-1. User authenticates with Okta
-2. Employee Assistant exchanges ID token for ID-JAG token
-3. ID-JAG token used directly (Lambda authorizer validates)
-4. MCP calls made with ID-JAG token
-
-## 📡 API Endpoints
-
-### **MCP Server Endpoints**
-- `GET /mcp/info` - Server information
-- `GET /mcp/health` - Health check
-- `GET /mcp/tools` - List available tools
-- `POST /mcp/tools/call` - Execute MCP tools
-
-### **Lambda Authorizer**
-- Automatically validates ID-JAG tokens
-- No separate auth endpoints needed
-
 ## 🧪 Testing
 
 ### **Local Testing**
@@ -156,11 +291,14 @@ curl -H "Authorization: Bearer YOUR_ID_JAG_TOKEN" \
 
 ### **CloudWatch Logs**
 ```bash
-# View Lambda function logs
-aws logs describe-log-groups --log-group-name-prefix '/aws/lambda/atko-mcp'
+# List Lambda log groups
+aws logs describe-log-groups --log-group-name-prefix '/aws/lambda/atko-document-server-mcp'
 
-# View specific function logs
-aws logs tail /aws/lambda/atko-mcp-document-server-prod-mcpServer --follow
+# View MCP server logs
+aws logs tail /aws/lambda/atko-document-server-mcp-McpServerFunction-* --follow
+
+# View authorizer logs
+aws logs tail /aws/lambda/atko-document-server-mcp-aut-McpAuthorizerFunction-* --follow
 ```
 
 ### **CloudWatch Metrics**
@@ -173,6 +311,14 @@ aws logs tail /aws/lambda/atko-mcp-document-server-prod-mcpServer --follow
 - Distributed tracing for request flows
 - Performance analysis
 - Error tracking
+
+## 🔒 Security
+
+- **ID-JAG Tokens**: Secure cross-app identity assertion
+- **Lambda Authorizer**: Serverless token validation
+- **IAM Roles**: Minimal required permissions
+- **API Gateway**: HTTPS enforcement and CORS management
+- **Environment Variables**: Secure configuration management
 
 ## 🛠️ Development
 
@@ -211,116 +357,32 @@ sam build
 sam deploy --guided
 ```
 
-## 🔒 Security
+## 📊 Performance & Cost
 
-### **IAM Roles**
-- Lambda execution roles with minimal permissions
-- CloudWatch Logs access
-- API Gateway invocation permissions
+### **Lambda Settings**
+- **Memory**: 512MB (adjust based on needs)
+- **Timeout**: 30 seconds (adjust based on external API calls)
+- **Concurrency**: Set limits if needed
 
-### **Environment Variables**
-- Secure parameter storage in SAM templates
-- NoEcho parameters for sensitive data
-- Environment-specific configurations
+### **API Gateway Settings**
+- **Caching**: Enable for static responses
+- **Throttling**: Set rate limits
+- **Compression**: Enable for large responses
 
-### **Authentication**
-- Lambda authorizer validates ID-JAG tokens
-- No additional token exchange needed
-- Direct Okta integration
-
-### **Network Security**
-- API Gateway handles CORS
-- HTTPS enforcement
-- Rate limiting capabilities
-
-## 📊 Cost Optimization
-
-### **Lambda Pricing**
-- **Compute**: $0.20 per 1M requests
-- **Duration**: $0.0000166667 per GB-second
-- **Free Tier**: 1M requests and 400,000 GB-seconds per month
-
-### **Optimization Tips**
-- Use provisioned concurrency for consistent performance
-- Optimize function memory allocation
-- Implement connection pooling for external APIs
-- Use Lambda layers for shared dependencies
-
-## 🚨 Troubleshooting
-
-### **Common Issues**
-
-#### **Deployment Failures**
+### **Cost Optimization**
 ```bash
-# Check CloudFormation stack status
-aws cloudformation describe-stacks --stack-name atko-mcp-document-server
-
-# View deployment events
-aws cloudformation describe-stack-events --stack-name atko-mcp-document-server
+# Monitor Lambda costs
+aws ce get-cost-and-usage \
+  --time-period Start=2024-01-01,End=2024-01-31 \
+  --granularity MONTHLY \
+  --metrics BlendedCost \
+  --group-by Type=DIMENSION,Key=SERVICE
 ```
 
-#### **Permission Errors**
-- Verify AWS credentials are configured
-- Check IAM roles and policies
-- Ensure CloudFormation permissions
+## 📚 Resources
 
-#### **Function Timeouts**
-- Increase Lambda timeout in SAM template
-- Optimize function code
-- Check external API response times
-
-#### **Authentication Issues**
-- Verify Okta configuration
-- Check ID-JAG token format
-- Validate Lambda authorizer logic
-
-### **Debug Commands**
-```bash
-# Test Lambda function directly
-aws lambda invoke --function-name atko-mcp-document-server-prod-mcpServer \
-  --payload '{"path":"/mcp/health","httpMethod":"GET"}' response.json
-
-# Check API Gateway logs
-aws logs describe-log-groups --log-group-name-prefix '/aws/apigateway'
-
-# View SAM deployment info
-sam info
-```
-
-## 🔄 Updating Deployments
-
-### **Update Existing Stack**
-```bash
-# Deploy updates
-sam deploy
-
-# Or with guided mode for parameter changes
-sam deploy --guided
-```
-
-### **Rollback Deployment**
-```bash
-# Rollback to previous version
-aws cloudformation rollback-stack --stack-name atko-mcp-document-server
-```
-
-## 📚 Additional Resources
-
-- [AWS SAM Documentation](https://docs.aws.amazon.com/serverless-application-model/)
-- [AWS Lambda Documentation](https://docs.aws.amazon.com/lambda/)
-- [API Gateway Documentation](https://docs.aws.amazon.com/apigateway/)
-- [CloudWatch Documentation](https://docs.aws.amazon.com/cloudwatch/)
 - [Okta ID-JAG Documentation](https://developer.okta.com/docs/guides/identity-assertion-jwt-access-grant/)
 - [MCP Specification](https://modelcontextprotocol.io/)
-
-## 🤝 Support
-
-For issues specific to AWS Lambda deployment:
-1. Check CloudWatch logs
-2. Verify IAM permissions
-3. Test locally with SAM
-4. Check AWS service status
-
----
-
-**Next Steps**: For Vercel deployment, see [README-VERCEL.md](./README-VERCEL.md)
+- [AWS Lambda Documentation](https://docs.aws.amazon.com/lambda/)
+- [AWS SAM Documentation](https://docs.aws.amazon.com/serverless-application-model/)
+- [API Gateway Documentation](https://docs.aws.amazon.com/apigateway/)
